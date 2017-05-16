@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    {% load static %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="{% static 'script.js' %}"></script>
+</head>
+
+<body>
+</body>
+<button class="mdl-button mdl-js-button mdl-button--fab plus-btn">
+    +
+</button>
+<button class="mdl-button mdl-js-button mdl-button--fab minus-btn">
+    -
+</button>
+<div id="graph"></div>
+
+</html>
