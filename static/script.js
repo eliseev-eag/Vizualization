@@ -5,27 +5,11 @@ var options = {
 };
 var elements = [];
 
-function setChartHeight(rowsCount) {
-    var paddingHeight = 50;
-    var rowHeight = (dataTable.getNumberOfRows()) * 41;
-    var chartHeight = rowHeight + paddingHeight;
-    options.height = chartHeight;
-}
-
 function create_chart() {
     google.charts.load("current", {packages: ["timeline"]});
     google.charts.setOnLoadCallback(function () {
-            initializeChart(function () {
-                get_events('1901-01-01', '1999-12-12')
-                    .then(function (rows) {
-                        dataTable.addRows(rows);
-                        elements = elements.concat(rows);
-                        setChartHeight();
-                        chart.draw(dataTable, options);
-                    });
-            });
-        }
-    );
+        initializeChart();
+    })
 }
 
 function initializeChart(callback) {
@@ -39,33 +23,52 @@ function initializeChart(callback) {
 
     google.visualization.events.addListener(chart, 'select', selectHandler);
 
-    callback();
+    get_events('1901-01-01', '1999-12-12')
+        .then(function (rows) {
+            dataTable.addRows(rows);
+            elements = elements.concat(rows);
+            setChartHeight();
+            chart.draw(dataTable, options);
+        });
+}
+
+function setChartHeight(rowsCount) {
+    var paddingHeight = 50;
+    var rowHeight = (dataTable.getNumberOfRows()) * 41;
+    var chartHeight = rowHeight + paddingHeight;
+    options.height = chartHeight;
 }
 
 function selectHandler() {
     var selectedItem = chart.getSelection()[0];
+    var isFirstDraw = true;
     if (selectedItem) {
         var value = dataTable.getValue(selectedItem.row, 0);
-        $("#graph").fadeOut("slow");
-        $("#graph").fadeIn(
-            {
-                duration: "slow",
-                start: function () {
-                    initializeChart(function () {
-                        $.ajax({
-                            type: 'GET',
-                            url: 'nested_events/' + value,
-                        })
-                            .done(function (data) {
-                                var rows = convertToGoogleChartArrayValue(data['events']);
-                                dataTable.addRows(rows);
-                                elements = elements.concat(rows);
-                                setChartHeight();
-                                chart.draw(dataTable, options);
-                            })
-                    });
+        $("#graph").fadeOut({
+            duration: "slow",
+            start: function () {
+                $.ajax({
+                    type: 'GET',
+                    url: 'nested_events/' + value,
+                })
+                    .done(function (data) {
+                        dataTable.removeRows(0, dataTable.getNumberOfRows());
+                        var rows = convertToGoogleChartArrayValue(data['events']);
+                        dataTable.addRows(rows);
+                        elements = elements.concat(rows);
+                        setChartHeight();
+                    })
+            }
+        });
+        $("#graph").fadeIn({
+            duration: "slow",
+            step: function () {
+                if (isFirstDraw) {
+                    chart.draw(dataTable, options);
+                    isFirstDraw = false;
                 }
-            });
+            }
+        });
     }
 }
 
@@ -106,28 +109,16 @@ function convertToGoogleChartArrayValue(items) {
 }
 
 window.onload = function () {
+    options['width'] = window.width;
     create_chart();
-    /*
-     $(".plus-btn").click(() => {
-     $("#graph").fadeOut("slow");
-     $("#graph").fadeIn(
-     {
-     duration: "slow",
-     start: () => initializeChart([
-     [, 'Немецкие танки подошли к Сталинграду', new Date(1942, 8, 23), new Date(1942, 8, 23)],
-     [, 'ЕГор, пожалуйста, извлеки вложенность событий, похоже это будет боль', new Date(1942, 8, 23), new Date(1943, 2, 2)],
-     [, 'Уничтожение армии Паулюса', new Date(1943, 2, 2), new Date(1943, 2, 2)]
-     ])
-     });});
 
-     $(window).resize(() => {
-     // $('#graph').width($(window).width());
-     // $('#graph').height($(window).height() - 50);
-     initializeChart(history_set);
-     });*/
+    $(window).resize(function () {
+        options['width'] = window.width;
+        chart.draw(dataTable, options);
+    });
 
     $(".minus-btn").click(function () {
-        $.ajax({ // Отправляем запрос
+        $.ajax({
             type: "GET",
             url: "events/1715-01-01/1899-05-10/",
         })
