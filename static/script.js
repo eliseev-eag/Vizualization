@@ -44,31 +44,34 @@ function selectHandler() {
     var isFirstDraw = true;
     if (selectedItem) {
         var value = dataTable.getValue(selectedItem.row, 0);
-        $("#graph").fadeOut({
-            duration: "slow",
-            start: function () {
-                $.ajax({
-                    type: 'GET',
-                    url: 'nested_events/' + value,
-                })
-                    .done(function (data) {
+        $.ajax({
+            type: 'GET',
+            url: 'nested_events/' + value,
+        })
+            .done(function (data) {
+                if(data['events'].length == 0) return;
+
+                $("#graph").fadeOut({
+                    duration: "slow",
+                    start: function () {
                         dataTable.removeRows(0, dataTable.getNumberOfRows());
                         var rows = convertToGoogleChartArrayValue(data['events']);
                         dataTable.addRows(rows);
                         elements = elements.concat(rows);
                         setChartHeight();
-                    })
-            }
-        });
-        $("#graph").fadeIn({
-            duration: "slow",
-            step: function () {
-                if (isFirstDraw) {
-                    chart.draw(dataTable, options);
-                    isFirstDraw = false;
-                }
-            }
-        });
+                    }
+                });
+
+                $("#graph").fadeIn({
+                    duration: "slow",
+                    step: function () {
+                        if (isFirstDraw) {
+                            chart.draw(dataTable, options);
+                            isFirstDraw = false;
+                        }
+                    }
+                });
+            });
     }
 }
 
