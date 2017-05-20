@@ -1,0 +1,9 @@
+#fullname{
+	display:none;
+	position:absolute;
+	background:red;
+	width:50%;
+	height:300px;
+	left:50%;
+	margin-left:-25%;
+}

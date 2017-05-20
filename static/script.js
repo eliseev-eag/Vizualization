@@ -59,8 +59,19 @@ function initializeChart() {
     get_events('1901-01-01', '1999-12-12')
         .then(function (rows) {
             var items = new vis.DataSet(rows);
-            var options = {};
+            var options = {
+				align:'center',
+				//orientation:{axis:'bottom',item:'top'},
+				//maxMinorChars:5
+				type:'range'
+			};
+			
             var timeline = new vis.Timeline(container, items, options);
+			// add event listener
+			timeline.on('mouseOver', function(environments){
+				if(environments.what == 'item')
+					alert('event!');
+			});
 
         });
 }
