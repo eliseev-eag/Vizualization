@@ -54,26 +54,47 @@ window.onload = function () {
     initializeChart();
 }
 
+//date to string toISOString.slice(0,10);
 function initializeChart() {
     var container = document.getElementById('graph');
     get_events('1901-01-01', '1999-12-12')
         .then(function (rows) {
             var items = new vis.DataSet(rows);
             var options = {
-				align:'center',
-				//orientation:{axis:'bottom',item:'top'},
-				//maxMinorChars:5
-				type:'range'
-			};
-			
+                align: 'center',
+                //orientation:{axis:'bottom',item:'top'},
+                //maxMinorChars:5
+                type: 'range'
+            };
+
             var timeline = new vis.Timeline(container, items, options);
-			// add event listener
-			timeline.on('mouseOver', function(environments){
-				if(environments.what == 'item')
-					alert('event!');
-			});
+            // add event listener
+
+            var fullname = document.getElementById('fullname');
+            var eventname = document.getElementById('eventname');
+            var spanWithStartDate = document.getElementById('start');
+            var spanWithEndDate = document.getElementById('end');
+
+            timeline.on('mouseOver', function (environments) {
+                if (environments.what == 'item') {
+                    var selectedEvent = items.get(environments.item);
+                    eventname.innerHTML = selectedEvent.content;
+                    spanWithStartDate.innerHTML = convertDateToRusStandart(selectedEvent.start);
+                    spanWithEndDate.innerHTML = convertDateToRusStandart(selectedEvent.end);
+                    fullname.style.left = environments.pageX + 'px';
+                    fullname.style.top = environments.pageY + 'px';
+                    fullname.style.display = 'block';
+                }
+                else
+                    fullname.style.display = 'none';
+            });
 
         });
+}
+
+function convertDateToRusStandart(date) {
+    var splittedDate = date.split('-');
+    return splittedDate[2] + '.' + splittedDate[1] + '.' + splittedDate[0];
 }
 
 function get_events(start_date, end_date) {
@@ -100,6 +121,7 @@ function convertToDistObject(items) {
         row.content = item.name;
         row.start = item.start_date;
         row.end = item.end_date;
+        row.className = 'red';
         rows.push(row);
     });
     return rows;

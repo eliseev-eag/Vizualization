@@ -5,11 +5,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <link rel="stylesheet" href="{% static 'vis-timeline-graph2d.min.css' %}">
-	<link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
-	<link rel="stylesheet" href="{% static 'style.css' %}">
-	
+{#    <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">#}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+
     <script type="text/javascript" src="{% static 'vis.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'bootstrap.min.js' %}"></script>
+{#    <script type="text/javascript" src="{% static 'bootstrap.min.js' %}"></script>#}
     <script type="text/javascript" src="{% static 'script.js' %}"></script>
 </head>
 
@@ -17,27 +17,14 @@
 </body>
 
 <div id="graph"></div>
-<div id="fullname"></div>
-
-<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#important-msg">
-  Launch demo modal
-</button>
-
-    <div class="modal fade " id="important-msg" tabindex="-1" role="dialog" aria-labelledby="important-msg-label" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title" id="important-msg-label">Message Title!</h4>
-          </div>
-          <div class="modal-body">
-            <p>Message text</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="dont-show-again">Don't Show Again</button>
-          </div>
-        </div>
-      </div>
+<div id="fullname">
+    <h3 id="eventname">Test</h3>
+    <hr>
+    <div class="dates">
+        <div><b>Дата начала: </b><span id="start"></span></div>
+        <div><b>Дата конца: </b><span id="end"></span></div>
     </div>
+    <hr>
+</div>
+
 </html>
