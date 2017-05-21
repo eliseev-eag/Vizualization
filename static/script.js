@@ -81,8 +81,11 @@ function initializeChart() {
                     eventname.innerHTML = selectedEvent.content;
                     spanWithStartDate.innerHTML = convertDateToRusStandart(selectedEvent.start);
                     spanWithEndDate.innerHTML = convertDateToRusStandart(selectedEvent.end);
+
                     fullname.style.left = environments.pageX + 'px';
                     fullname.style.top = environments.pageY + 'px';
+                    if ($(fullname).width() + environments.pageX > $(window).width())
+                        fullname.style.left = $(window).width() - $(fullname).width() - 10 + 'px';
                     fullname.style.display = 'block';
                 }
                 else
