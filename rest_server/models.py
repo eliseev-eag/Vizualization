@@ -8,6 +8,7 @@ class Event(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     parent_event = models.ForeignKey('self', null=True, blank=True)
+    article_id = models.BigIntegerField()
 
     def __str__(self):
         return self.name
