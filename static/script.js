@@ -27,11 +27,11 @@ function UploadEventsAjaxAndUpdateTimeline(environments) {
     var visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
-        var start_date = new Date(visibleItem.start);
+        /*var start_date = new Date(visibleItem.start);
         var end_date = new Date(visibleItem.end);
-        var duration_time = end_date - start_date;
+        var duration_time = end_date - start_date;*/
         var timeline_length = environments.end - environments.start;
-        if (duration_time > timeline_length * 0.2) {
+        if (visibleItem.duration > timeline_length * 0.2) {
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
                     if (rows.length > 1) {
@@ -55,13 +55,14 @@ function fillFullnameForm(environments) {
     var eventname = document.getElementById('eventname');
     var spanWithStartDate = document.getElementById('start');
     var spanWithEndDate = document.getElementById('end');
+    var spanWithDurationTime = document.getElementById('duration');
 
     if (environments.what == 'item') {
         var selectedEvent = items.get(environments.item);
         eventname.innerHTML = selectedEvent.content;
         spanWithStartDate.innerHTML = convertDateToRusStandart(selectedEvent.start);
         spanWithEndDate.innerHTML = convertDateToRusStandart(selectedEvent.end);
-
+        spanWithDurationTime.innerHTML = Math.floor(selectedEvent.duration /(1000 * 60 * 60 * 24));
         fullname.style.left = environments.pageX + 'px';
         fullname.style.top = environments.pageY + 'px';
         if ($(fullname).width() + environments.pageX > $(window).width())
@@ -121,6 +122,7 @@ function convertToDistObject(items) {
         row.content = item.name;
         row.start = item.start_date;
         row.end = item.end_date;
+        row.duration = (new Date(item.end_date) - new Date(item.start_date));
         /*if(row.id == 4)
          row.type = 'background';*/
         //row.className = 'red';
