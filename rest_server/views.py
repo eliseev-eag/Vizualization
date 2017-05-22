@@ -23,7 +23,7 @@ def get_events(request, start_date, end_date):
     events = Event.objects.annotate(duration=duration).filter(end_date__gte=start_date,
                                                               start_date__lte=end_date,
                                                               duration__gte=timeline_length,
-                                                              )
+                                                              parent_event__isnull=True)
     values = events.values('id', 'start_date', 'end_date', 'name')
     return JsonResponse({'events': list(values)})
 
@@ -31,5 +31,5 @@ def get_events(request, start_date, end_date):
 def get_nested(request, parent_event_id):
     parent_event = Event.objects.get(pk=parent_event_id)
     events = Event.objects.filter(parent_event=parent_event)
-    values = events.values('id', 'start_date', 'end_date', 'name')
+    values = events.values()
     return JsonResponse({'events': list(values)})
