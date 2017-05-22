@@ -16,6 +16,14 @@ function initializeChart() {
 
     var timeline = new vis.Timeline(container, items, options);
     timeline.on('rangechanged', function (environments) {
+        var visibleItemsIndexes = timeline.getVisibleItems();
+        visibleItemsIndexes.forEach(function (visibleItemIndex) {
+            var visibleItem = items.get(visibleItemIndex);
+            var start_date = new Date(visibleItem.start);
+            var end_date = new Date(visibleItem.end);
+            var duration_time = (end_date - start_date);
+
+        });
         get_events(environments.start.toISOString().slice(0, 10), environments.end.toISOString().slice(0, 10))
             .then(function (rows) {
                 var updated = items.update(rows);
@@ -78,7 +86,7 @@ function convertToDistObject(items) {
         row.content = item.name;
         row.start = item.start_date;
         row.end = item.end_date;
-        row.className = 'red';
+        //row.className = 'red';
         rows.push(row);
     });
     return rows;

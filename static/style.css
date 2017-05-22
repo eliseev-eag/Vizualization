@@ -1,3 +1,7 @@
+body {
+
+}
+
 #fullname {
     display: none;
     position: absolute;
@@ -12,18 +16,28 @@
 #eventname {
     text-align: center;
 }
-.dates *{
+
+.dates * {
     padding: 5px;
     text-align: center;
 }
-hr{
+
+hr {
     padding: 0px;
     margin: 10px;
     color: gray;
+}
+
+.vis-timeline {
+    border: none;
 }
 
 .vis-item.red {
     color: white;
     background-color: red;
     border-color: darkred;
+}
+
+.vis-item .vis-item-overflow {
+    overflow: visible;
 }

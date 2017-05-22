@@ -23,7 +23,7 @@ def get_events(request, start_date, end_date):
     events = Event.objects.annotate(duration=duration).filter(end_date__gte=start_date,
                                                               start_date__lte=end_date,
                                                               duration__gte=timeline_length,
-                                                              parent_event__isnull=True)
+                                                              )
     values = events.values('id', 'start_date', 'end_date', 'name')
     return JsonResponse({'events': list(values)})
 
