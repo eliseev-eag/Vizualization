@@ -11,6 +11,7 @@ function initializeChart() {
         align: 'center',
         //orientation:{axis:'bottom',item:'top'},
         //maxMinorChars:5
+        minHeight:'250px',
         type: 'range'
     };
 
@@ -86,6 +87,8 @@ function convertToDistObject(items) {
         row.content = item.name;
         row.start = item.start_date;
         row.end = item.end_date;
+        if(row.id == 4)
+            row.type = 'background';
         //row.className = 'red';
         rows.push(row);
     });

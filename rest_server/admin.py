@@ -5,3 +5,5 @@ from rest_server.models import *
 
 admin.site.register(Event)
 admin.site.register(RelationshipOfEvents)
+admin.site.register(Toponym)
+admin.site.register(Person)
