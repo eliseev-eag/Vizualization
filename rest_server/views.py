@@ -1,5 +1,9 @@
 import json
 
+from datetime import datetime
+
+from django.db.models import ExpressionWrapper, fields
+from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -11,7 +15,14 @@ def index(request):
 
 
 def get_events(request, start_date, end_date):
-    events = Event.objects.filter(end_date__gte=start_date, start_date__lte=end_date, parent_event__isnull=True)
+    start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+    timeline_length = ((end_date - start_date) * 0.01)
+    duration = ExpressionWrapper(F('end_date') - F('start_date'), output_field=fields.DurationField())
+    events = Event.objects.annotate(duration=duration).filter(end_date__gte=start_date,
+                                                              start_date__lte=end_date,
+                                                              duration__gte=timeline_length)
     values = events.values('id', 'start_date', 'end_date', 'name')
     return JsonResponse({'events': list(values)})
 
