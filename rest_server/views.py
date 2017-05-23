@@ -31,5 +31,5 @@ def get_events(request, start_date, end_date):
 def get_nested(request, parent_event_id):
     parent_event = Event.objects.get(pk=parent_event_id)
     events = Event.objects.filter(parent_event=parent_event)
-    values = events.values()
+    values = events.values('id', 'start_date', 'end_date', 'name')
     return JsonResponse({'events': list(values)})

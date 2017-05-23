@@ -27,9 +27,6 @@ function UploadEventsAjaxAndUpdateTimeline(environments) {
     var visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
-        /*var start_date = new Date(visibleItem.start);
-        var end_date = new Date(visibleItem.end);
-        var duration_time = end_date - start_date;*/
         var timeline_length = environments.end - environments.start;
         if (visibleItem.duration > timeline_length * 0.2) {
             uploadNestedEventsAjax(visibleItem.id)
@@ -62,7 +59,9 @@ function fillFullnameForm(environments) {
         eventname.innerHTML = selectedEvent.content;
         spanWithStartDate.innerHTML = convertDateToRusStandart(selectedEvent.start);
         spanWithEndDate.innerHTML = convertDateToRusStandart(selectedEvent.end);
-        spanWithDurationTime.innerHTML = Math.floor(selectedEvent.duration /(1000 * 60 * 60 * 24));
+        var millisecInDay = 1000 * 60 * 60 * 24;
+        spanWithDurationTime.innerHTML = Math.floor(selectedEvent.duration / millisecInDay);
+
         fullname.style.left = environments.pageX + 'px';
         fullname.style.top = environments.pageY + 'px';
         if ($(fullname).width() + environments.pageX > $(window).width())
@@ -114,19 +113,11 @@ function uploadNestedEventsAjax(parent_event_id) {
 
 
 function convertToDistObject(items) {
-    var rows = [];
     items.forEach(function (item) {
-        var row = {};
-        row.id = item.id;
-        //row.item = item.id;
-        row.content = item.name;
-        row.start = item.start_date;
-        row.end = item.end_date;
-        row.duration = (new Date(item.end_date) - new Date(item.start_date));
-        /*if(row.id == 4)
-         row.type = 'background';*/
-        //row.className = 'red';
-        rows.push(row);
+        item.content = item.name;
+        item.start = item.start_date;
+        item.end = item.end_date;
+        item.duration = (new Date(item.end_date) - new Date(item.start_date));
     });
-    return rows;
+    return items;
 }
