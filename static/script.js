@@ -3,6 +3,11 @@ var timeline;
 
 window.onload = function () {
     initializeChart();
+
+    $('#id_event_type,#id_toponyms,#id_persons').click(function (e) {
+        return false;
+    });
+
 }
 
 function initializeChart() {
