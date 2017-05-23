@@ -5,11 +5,13 @@ from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import render
 
+from rest_server.forms import EventSearchForm
 from rest_server.models import Event
 
 
 def index(request):
-    return render(request, 'index.html')
+    event_search_form = EventSearchForm()
+    return render(request, 'index.html', {'form': event_search_form})
 
 
 def get_events(request, start_date, end_date):

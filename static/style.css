@@ -17,10 +17,11 @@ body, html {
 #eventname {
     text-align: center;
     font-size: 14px;
+    font-weight: bold;
 }
 
 .dates {
-    height: 70px
+    height: 80px
 }
 
 .dates * {
