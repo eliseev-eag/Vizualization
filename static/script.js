@@ -11,8 +11,6 @@ function initializeChart() {
 
     var options = {
         align: 'center',
-        //orientation:{axis:'bottom',item:'top'},
-        //maxMinorChars:5
         minHeight: '250px',
         type: 'range'
     };
@@ -28,15 +26,25 @@ function UploadEventsAjaxAndUpdateTimeline(environments) {
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
         var timeline_length = environments.end - environments.start;
-        if (visibleItem.duration > timeline_length * 0.2) {
+        if (visibleItem.duration > timeline_length * 0.15 && (!visibleItem.nested || !visibleItem.nested.length)) {
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
                     if (rows.length > 1) {
+                        visibleItem.nested = rows.map(function (rowsItem) {
+                            return rowsItem.id;
+                        });
                         visibleItem.type = 'background';
                         items.update(visibleItem);
                         items.update(rows);
                     }
                 });
+        }
+
+        if (visibleItem.duration < timeline_length * 0.1 && visibleItem.type == 'background') {
+            items.remove(visibleItem.nested);
+            visibleItem.nested = [];
+            visibleItem.type = 'range';
+            items.update(visibleItem);
         }
 
     });
