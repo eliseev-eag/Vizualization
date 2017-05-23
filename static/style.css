@@ -3,11 +3,14 @@ body, html {
     font-size: 11pt;
 }
 
+#fullname, .div-range, .btn {
+    border-radius: 4px
+}
+
 #fullname {
     display: none;
     position: absolute;
     background: white;
-    border-radius: 2px;
     border: solid 1px #bdbdbd;
     width: 245px;
     font-size: 12px;
@@ -42,23 +45,22 @@ hr {
     border: none;
 }
 
-.vis-range{
+.vis-range {
     color: white;
     background-color: red;
     border-color: darkred;
     cursor: pointer;
 }
 
-.vis-range:hover{
+.vis-range:hover {
     color: black;
     opacity: 0.75;
 }
 
 .vis-item .vis-item-overflow {
     overflow: visible;
-    color:black;
+    color: black;
 }
-
 
 .vis-background {
     color: lightgray;
@@ -68,4 +70,17 @@ hr {
 .vis-background:hover {
     color: red;
     opacity: 1
+}
+
+form {
+    margin: 10px 10%;
+}
+
+.form-group {
+    margin: 5px 5px;
+}
+
+#id_name {
+    margin: 10px 0;
+    width: 90%;
 }

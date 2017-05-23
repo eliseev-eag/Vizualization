@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import CheckboxSelectMultiple, SelectMultiple, Select
 
 from rest_server.models import Event
 
@@ -13,7 +14,7 @@ class EventSearchForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = ('name', 'start_date', 'end_date', 'event_type', 'toponyms', 'persons')
+        fields = ('start_date', 'end_date', 'event_type', 'toponyms', 'persons', 'name')
         labels = {
             'name': '',
             'start_date': 'Дата начала',
@@ -21,4 +22,10 @@ class EventSearchForm(forms.ModelForm):
             'event_type': 'Тип события',
             'toponyms': 'Встречаемые топонимы',
             'persons': 'Действующие лица'
+        }
+        widgets = {
+            'event_type': SelectMultiple(choices=(('sport', 'Спортивные события',), ('war', 'Военные события')),
+                                         attrs={'size': 2}),
+            'toponyms': SelectMultiple(attrs={'size': 2}),
+            'persons': SelectMultiple(attrs={'size': 2}),
         }

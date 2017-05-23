@@ -17,19 +17,48 @@
 
 <body>
 </body>
-<form method="POST" class="post-form form-inline">{% csrf_token %}
-    {{ form }}
-    <button type="submit" class="save btn btn-default"> Найти</button>
-</form>
-<br>
-<div id="graph"></div>
-<div id="fullname">
-    <h3 id="eventname">Test</h3>
-    <hr>
-    <div class="dates">
-        <div><span id="start"></span><span>-</span><span id="end"></span></div>
-        <div><b>Продолжительность: </b><span id="duration"></span> дн.</div>
+<div class="container-fluid">
+    <div class="row">
+        <form method="POST" class="post-form form-inline">{% csrf_token %}
+
+            <div class="row">
+                {{ form.name }}
+                <button type="submit" class="save btn btn-success"> Найти</button>
+            </div>
+            <div class="row">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        Фильтры <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% for field in form %}
+                            {% if field.name != 'name' %}
+                                <li>
+                                    <div class="form-group">
+                                        <label class="control-label"
+                                               for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                        {{ field }}
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div class="row">
+        <div id="graph"></div>
+        <div id="fullname">
+            <h3 id="eventname">Test</h3>
+            <hr>
+            <div class="dates">
+                <div><span id="start"></span><span>-</span><span id="end"></span></div>
+                <div><b>Продолжительность: </b><span id="duration"></span> дн.</div>
+            </div>
+        </div>
     </div>
 </div>
-
 </html>
