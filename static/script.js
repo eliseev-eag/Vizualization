@@ -1,6 +1,6 @@
 var items;
 var timeline;
-
+var groups;
 window.onload = function () {
     initializeChart();
 
@@ -20,7 +20,16 @@ function initializeChart() {
         type: 'range'
     };
 
-    timeline = new vis.Timeline(container, items, options);
+    groups = new vis.DataSet([
+        {id: 'Спортивное событие', content: 'Спортивное событие', class: 'blue'},
+        {id: 'Военное событие', content: 'Военное событие', class: 'red'}
+    ]);
+
+    timeline = new vis.Timeline(container);
+    timeline.setOptions(options);
+    timeline.setGroups(groups);
+    timeline.setItems(items);
+
     timeline.on('mouseOver', fillFullnameForm);
     timeline.on('rangechanged', UploadEventsAjaxAndUpdateTimeline);
 }
@@ -45,7 +54,7 @@ function UploadEventsAjaxAndUpdateTimeline(environments) {
                 });
         }
 
-        if (visibleItem.duration < timeline_length * 0.1 && visibleItem.type == 'background') {
+        if (visibleItem.duration < timeline_length * 0.07 && visibleItem.type == 'background') {
             items.remove(visibleItem.nested);
             visibleItem.nested = [];
             visibleItem.type = 'range';
@@ -131,6 +140,8 @@ function convertToDistObject(items) {
         item.start = item.start_date;
         item.end = item.end_date;
         item.duration = (new Date(item.end_date) - new Date(item.start_date));
+        item.group = item.event_type;
+        item.className = groups.get(item.group).class;
     });
     return items;
 }

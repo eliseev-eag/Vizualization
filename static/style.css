@@ -49,17 +49,25 @@ hr {
     border: none;
 }
 
-.vis-range {
+.vis-item{
+    cursor: pointer;
+}
+.red {
     color: white;
     background-color: red;
     border-color: darkred;
-    cursor: pointer;
+}
+.blue{
+    background-color: rgb(66, 133, 244);
+    border-color: darkblue;
+    color: white;
 }
 
-.vis-range:hover {
+.red:hover, .blue:hover {
     color: black;
     opacity: 0.75;
 }
+
 
 .vis-item .vis-item-overflow {
     overflow: visible;

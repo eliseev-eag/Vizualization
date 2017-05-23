@@ -24,7 +24,7 @@ class EventSearchForm(forms.ModelForm):
             'persons': 'Действующие лица'
         }
         widgets = {
-            'event_type': SelectMultiple(choices=(('sport', 'Спортивные события',), ('war', 'Военные события')),
+            'event_type': SelectMultiple(choices=(('sport', 'Спортивное событие',), ('war', 'Военное событие')),
                                          attrs={'size': 2}),
             'toponyms': SelectMultiple(attrs={'size': 2}),
             'persons': SelectMultiple(attrs={'size': 2}),
