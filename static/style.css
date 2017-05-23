@@ -9,20 +9,18 @@ body, html {
     background: white;
     border-radius: 2px;
     border: solid 1px #bdbdbd;
-    width: 240px;
-    height: 150px;
+    width: 245px;
     font-size: 12px;
     z-index: 50;
 }
 
 #eventname {
-    text-align: left;
+    text-align: center;
     font-size: 14px;
-    padding-left: 2em;
 }
 
-.dates{
-    margin: auto;
+.dates {
+    height: 70px
 }
 
 .dates * {
@@ -43,15 +41,22 @@ hr {
     border: none;
 }
 
-.vis-item.red {
+.vis-range{
     color: white;
     background-color: red;
     border-color: darkred;
 }
 
+.vis-range:hover{
+    color: black;
+    opacity: 0.75;
+}
+
 .vis-item .vis-item-overflow {
     overflow: visible;
+    color:black;
 }
+
 /*
 
 .vis-background {
