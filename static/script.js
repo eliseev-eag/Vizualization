@@ -22,7 +22,8 @@ function initializeChart() {
 
     groups = new vis.DataSet([
         {id: 'Спортивное событие', content: 'Спортивное событие', class: 'blue'},
-        {id: 'Военное событие', content: 'Военное событие', class: 'red'}
+        {id: 'Военное событие', content: 'Военное событие', class: 'red'},
+        {id: '', content: '', class: null}
     ]);
 
     timeline = new vis.Timeline(container);
@@ -141,7 +142,9 @@ function convertToDistObject(items) {
         item.end = item.end_date;
         item.duration = (new Date(item.end_date) - new Date(item.start_date));
         item.group = item.event_type;
-        item.className = groups.get(item.group).class;
+        var groupItem = groups.get(item.group);
+        if (groupItem)
+            item.className = groupItem.class;
     });
     return items;
 }
