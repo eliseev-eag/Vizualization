@@ -53,7 +53,10 @@ function UploadEventsAjaxAndUpdateTimeline(environments) {
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
         var timeline_length = environments.end - environments.start;
-        if (visibleItem.duration > timeline_length * 0.15 && (!visibleItem.nested || !visibleItem.nested.length)) {
+
+        if (visibleItem.nested === null) return;
+
+        if ((visibleItem.nested == undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.15) {
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
                     if (rows.length > 0) {
@@ -61,9 +64,12 @@ function UploadEventsAjaxAndUpdateTimeline(environments) {
                             return rowsItem.id;
                         });
                         visibleItem.type = 'background';
-                        items.update(visibleItem);
                         items.update(rows);
                     }
+                    else {
+                        visibleItem.nested = null;
+                    }
+                    items.update(visibleItem);
                 });
         }
 
