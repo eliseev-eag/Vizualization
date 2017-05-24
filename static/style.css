@@ -7,6 +7,7 @@ body, html {
     border-radius: 4px
 }
 
+/* Стили для всплывающего окна с продолжительносттью события */
 #fullname {
     display: none;
     position: absolute;
@@ -41,29 +42,13 @@ hr {
     opacity: 0.3;
 }
 
+/* Общие стили для vis.js объектов */
 .vis-timeline {
     border: none;
 }
 
 .vis-item {
     cursor: pointer;
-}
-
-.red {
-    color: white;
-    background-color: red;
-    border-color: darkred;
-}
-
-.blue {
-    background-color: rgb(66, 133, 244);
-    border-color: darkblue;
-    color: white;
-}
-
-.red:hover, .blue:hover {
-    color: black;
-    opacity: 0.75;
 }
 
 .vis-item .vis-item-overflow {
@@ -81,6 +66,43 @@ hr {
     opacity: 1
 }
 
+/* Стили для className item-ов */
+.red {
+    background-color: red;
+    border-color: darkred;
+    color: white;
+}
+
+.blue {
+    background-color: rgb(66, 133, 244);
+    border-color: darkblue;
+    color: white;
+}
+
+.purple {
+    background-color: rgb(171, 71, 188);
+    border-color: darkmagenta;
+    color: white;
+}
+
+.green{
+    background-color: rgb(15, 157, 88);
+    border-color: darkgreen;
+    color: white;
+}
+
+.yellow{
+    background-color: rgb(244, 180, 0);
+    border-color: darkgoldenrod;
+    color: black;
+}
+
+.red:hover, .blue:hover, .green:hover, .purple:hover, .yellow:hover {
+    color: black;
+    opacity: 0.75;
+}
+
+/* Стили  для виджетов поиска */
 form {
     margin: 10px 10%;
 }

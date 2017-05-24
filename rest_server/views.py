@@ -33,3 +33,8 @@ def get_nested(request, parent_event_id):
     events = Event.objects.filter(parent_event=parent_event)
     values = events.values('id', 'start_date', 'end_date', 'name', 'event_type', 'parent_event')
     return JsonResponse({'events': list(values)})
+
+
+def get_event_types(request):
+    event_types = Event.objects.values_list('event_type').distinct()
+    return JsonResponse(list(event_types),safe=False)

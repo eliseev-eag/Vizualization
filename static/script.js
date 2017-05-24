@@ -20,19 +20,31 @@ function initializeChart() {
         type: 'range'
     };
 
-    groups = new vis.DataSet([
-        {id: 'Спортивное событие', content: 'Спортивное событие', class: 'blue'},
-        {id: 'Военное событие', content: 'Военное событие', class: 'red'},
-        {id: '', content: '', class: null}
-    ]);
+    var classes = ['blue', 'red', 'purple', 'yellow', 'green'];
 
-    timeline = new vis.Timeline(container);
-    timeline.setOptions(options);
-    timeline.setGroups(groups);
-    timeline.setItems(items);
+    $.ajax({
+        type: 'GET',
+        url: 'event_types',
+    })
+        .done(function (eventTypes) {
+            var groupsItemsArray = eventTypes.map(function (eventTypesItem) {
+                var groupItem = {};
+                groupItem.id = eventTypesItem;
+                groupItem.content = eventTypesItem;
+                groupItem.class = classes[Math.floor(Math.random() * classes.length)];
+                return groupItem;
+            });
 
-    timeline.on('mouseOver', fillFullnameForm);
-    timeline.on('rangechanged', UploadEventsAjaxAndUpdateTimeline);
+            groups = new vis.DataSet(groupsItemsArray);
+
+            timeline = new vis.Timeline(container);
+            timeline.setOptions(options);
+            timeline.setGroups(groups);
+            timeline.setItems(items);
+
+            timeline.on('mouseOver', fillFullnameForm);
+            timeline.on('rangechanged', UploadEventsAjaxAndUpdateTimeline);
+        })
 }
 
 
