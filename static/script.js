@@ -43,7 +43,7 @@ function UploadEventsAjaxAndUpdateTimeline(environments) {
         if (visibleItem.duration > timeline_length * 0.15 && (!visibleItem.nested || !visibleItem.nested.length)) {
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
-                    if (rows.length > 1) {
+                    if (rows.length > 0) {
                         visibleItem.nested = rows.map(function (rowsItem) {
                             return rowsItem.id;
                         });
