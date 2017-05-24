@@ -7,10 +7,6 @@ body, html {
     border-radius: 4px
 }
 
-#filters_btn{
-    margin-top: 10px;
-}
-
 #fullname {
     display: none;
     position: absolute;
@@ -49,15 +45,17 @@ hr {
     border: none;
 }
 
-.vis-item{
+.vis-item {
     cursor: pointer;
 }
+
 .red {
     color: white;
     background-color: red;
     border-color: darkred;
 }
-.blue{
+
+.blue {
     background-color: rgb(66, 133, 244);
     border-color: darkblue;
     color: white;
@@ -67,7 +65,6 @@ hr {
     color: black;
     opacity: 0.75;
 }
-
 
 .vis-item .vis-item-overflow {
     overflow: visible;
@@ -92,7 +89,15 @@ form {
     margin: 5px 5px;
 }
 
+#id_toponyms, #id_persons, #id_event_type {
+    width: 100%;
+}
+
 #id_name {
     margin: 10px 0;
     width: 90%;
+}
+
+#filters_btn {
+    margin-top: 10px;
 }
