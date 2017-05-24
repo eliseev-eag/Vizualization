@@ -1,6 +1,6 @@
 var items;
 var timeline;
-
+var groups;
 window.onload = function () {
     initializeChart();
 
@@ -20,9 +20,31 @@ function initializeChart() {
         type: 'range'
     };
 
-    timeline = new vis.Timeline(container, items, options);
-    timeline.on('mouseOver', fillFullnameForm);
-    timeline.on('rangechanged', UploadEventsAjaxAndUpdateTimeline);
+    var classes = ['blue', 'red', 'purple', 'yellow', 'green'];
+
+    $.ajax({
+        type: 'GET',
+        url: 'event_types',
+    })
+        .done(function (eventTypes) {
+            var groupsItemsArray = eventTypes.map(function (eventTypesItem) {
+                var groupItem = {};
+                groupItem.id = eventTypesItem;
+                groupItem.content = eventTypesItem;
+                groupItem.class = classes[Math.floor(Math.random() * classes.length)];
+                return groupItem;
+            });
+
+            groups = new vis.DataSet(groupsItemsArray);
+
+            timeline = new vis.Timeline(container);
+            timeline.setOptions(options);
+            timeline.setGroups(groups);
+            timeline.setItems(items);
+
+            timeline.on('mouseOver', fillFullnameForm);
+            timeline.on('rangechanged', UploadEventsAjaxAndUpdateTimeline);
+        })
 }
 
 
@@ -31,21 +53,27 @@ function UploadEventsAjaxAndUpdateTimeline(environments) {
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
         var timeline_length = environments.end - environments.start;
-        if (visibleItem.duration > timeline_length * 0.15 && (!visibleItem.nested || !visibleItem.nested.length)) {
+
+        if (visibleItem.nested === null) return;
+
+        if ((visibleItem.nested == undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.15) {
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
-                    if (rows.length > 1) {
+                    if (rows.length > 0) {
                         visibleItem.nested = rows.map(function (rowsItem) {
                             return rowsItem.id;
                         });
                         visibleItem.type = 'background';
-                        items.update(visibleItem);
                         items.update(rows);
                     }
+                    else {
+                        visibleItem.nested = null;
+                    }
+                    items.update(visibleItem);
                 });
         }
 
-        if (visibleItem.duration < timeline_length * 0.1 && visibleItem.type == 'background') {
+        if (visibleItem.duration < timeline_length * 0.07 && visibleItem.type == 'background') {
             items.remove(visibleItem.nested);
             visibleItem.nested = [];
             visibleItem.type = 'range';
@@ -131,6 +159,10 @@ function convertToDistObject(items) {
         item.start = item.start_date;
         item.end = item.end_date;
         item.duration = (new Date(item.end_date) - new Date(item.start_date));
+        item.group = item.event_type;
+        var groupItem = groups.get(item.group);
+        if (groupItem)
+            item.className = groupItem.class;
     });
     return items;
 }
