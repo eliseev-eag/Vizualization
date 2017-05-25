@@ -19,31 +19,31 @@
 </body>
 <div class="container-fluid">
     <div class="row">
-        <form method="POST" action="{% url 'search' %}" class="post-form form-inline" >{% csrf_token %}
+        <form method="POST" action="{% url 'search' %}" class="post-form form-inline">{% csrf_token %}
             <div class="row">
                 {{ form.name }}
                 <button type="submit" class="save btn btn-success"> Найти</button>
             </div>
             <div class="row">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false" id="filters_btn">
-                        Фильтры <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
+                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#filters"
+                        aria-expanded="false" aria-controls="collapseExample" id="filters_btn">
+                    Фильтры <span class="caret"></span>
+                </button>
+                <div class="collapse" id="filters">
+                    <div class="well">
                         {% for field in form %}
                             {% if field.name != 'name' %}
-                                <li>
                                     <div class="form-group">
                                         <label class="control-label"
                                                for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                        <br>
                                         {{ field }}
                                     </div>
-                                </li>
                             {% endif %}
                         {% endfor %}
-                    </ul>
+                    </div>
                 </div>
+
             </div>
         </form>
     </div>

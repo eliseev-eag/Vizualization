@@ -61,9 +61,10 @@ hr {
     opacity: 1;
 }
 
-.vis-background:hover {
-    color: red;
-    opacity: 1
+.vis-backgroundL .vis-item-content:hover {
+    font-size: 14pt;
+    text-shadow: 1px 1px 2px gray;
+    z-index: 50;
 }
 
 /* Стили для className item-ов */
@@ -85,13 +86,13 @@ hr {
     color: white;
 }
 
-.green{
+.green {
     background-color: rgb(15, 157, 88);
     border-color: darkgreen;
     color: white;
 }
 
-.yellow{
+.yellow {
     background-color: rgb(244, 180, 0);
     border-color: darkgoldenrod;
     color: black;
@@ -109,6 +110,13 @@ form {
 
 .form-group {
     margin: 5px 5px;
+}
+
+.well {
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+
 }
 
 #id_toponyms, #id_persons, #id_event_type {

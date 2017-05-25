@@ -3,11 +3,6 @@ var timeline;
 var groups;
 window.onload = function () {
     initializeChart();
-
-    $('#id_event_type,#id_toponyms,#id_persons').click(function (e) {
-        return false;
-    });
-
 }
 
 function initializeChart() {
@@ -17,7 +12,8 @@ function initializeChart() {
     var options = {
         align: 'center',
         minHeight: '250px',
-        type: 'range'
+        type: 'range',
+        zoomMin:1000 * 60 * 60 * 24 * 5,
     };
 
     var classes = ['blue', 'red', 'purple', 'yellow', 'green'];
@@ -37,10 +33,7 @@ function initializeChart() {
 
             groups = new vis.DataSet(groupsItemsArray);
 
-            timeline = new vis.Timeline(container);
-            timeline.setOptions(options);
-            timeline.setGroups(groups);
-            timeline.setItems(items);
+            timeline = new vis.Timeline(container,items,groups,options);
 
             timeline.on('mouseOver', fillFullnameForm);
             timeline.on('rangechanged', UploadEventsAjaxAndUpdateTimeline);

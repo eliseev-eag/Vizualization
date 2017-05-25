@@ -41,7 +41,7 @@ def get_event_types(request):
 
 
 def search(request):
-    if not request.method == "POST":
+    if request.method != "POST":
         return None
 
     form = EventSearchForm(request.POST)
