@@ -8,7 +8,7 @@ class Event(models.Model):
     end_date = models.DateField()
     parent_event = models.ForeignKey('self', null=True, blank=True)
     article_id = models.BigIntegerField(blank=True, null=True)
-    event_type = models.CharField(max_length=15000, blank=True)
+    event_type = models.CharField(max_length=15000, blank=True, default='(Без категории)')
     toponyms = models.ManyToManyField('Toponym', blank=True)
     persons = models.ManyToManyField('Person', blank=True)
 

@@ -47,26 +47,6 @@
             </div>
         </form>
     </div>
-
-    <script type="text/javascript">
-        var frm = $('#search');
-        frm.submit(function () {
-            $.ajax({
-                type: frm.attr('method'),
-                url: frm.attr('action'),
-                data: frm.serialize(),
-                success: function (data) {
-                    alert(data);
-                    console.log(data);
-                },
-                error: function (data) {
-                    console.log(data.responseText);
-                }
-            });
-            return false;
-        });
-    </script>
-
     <div class="row">
         <div id="graph"></div>
         <div id="fullname">

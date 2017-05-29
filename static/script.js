@@ -1,8 +1,33 @@
 var items;
 var timeline;
 var groups;
+
 window.onload = function () {
     initializeChart();
+    var searchForm = $('#search');
+    searchForm.submit(function () {
+        search(searchForm);
+        return false;
+    });
+}
+
+function search(searchForm) {
+    $.ajax({
+        type: searchForm.attr('method'),
+        url: searchForm.attr('action'),
+        data: searchForm.serialize(),
+    })
+        .done(function (data) {
+            console.log(data);
+            timeline.off('rangechanged', UploadEventsAjax);
+            items.clear();
+            var result = convertToDistObject(data['events'])
+            items.update(result);
+        })
+        .fail(function (data) {
+            timeline.on('rangechanged', UploadEventsAjax);
+            items.clear();
+        });
 }
 
 function initializeChart() {
@@ -11,9 +36,11 @@ function initializeChart() {
 
     var options = {
         align: 'center',
-        minHeight: '250px',
+        minHeight: '500px',
+        maxHeight: '500px',
         type: 'range',
-        zoomMin:1000 * 60 * 60 * 24 * 5,
+        orientation: {axis: 'both'},
+        zoomMin: 1000 * 60 * 60 * 24 * 5,
     };
 
     var classes = ['blue', 'red', 'purple', 'yellow', 'green'];
@@ -33,15 +60,17 @@ function initializeChart() {
 
             groups = new vis.DataSet(groupsItemsArray);
 
-            timeline = new vis.Timeline(container,items,groups,options);
+            timeline = new vis.Timeline(container, items, groups, options);
 
             timeline.on('mouseOver', fillFullnameForm);
-            timeline.on('rangechanged', UploadEventsAjaxAndUpdateTimeline);
+            timeline.on('rangechanged', UploadEventsAjax);
+            timeline.on('rangechanged', UploadAndHideNestedEvents);
+
         })
 }
 
 
-function UploadEventsAjaxAndUpdateTimeline(environments) {
+function UploadAndHideNestedEvents(environments) {
     var visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
@@ -74,7 +103,12 @@ function UploadEventsAjaxAndUpdateTimeline(environments) {
         }
 
     });
-    uploadEventsAjax(environments.start.toISOString().slice(0, 10), environments.end.toISOString().slice(0, 10))
+}
+function UploadEventsAjax(environments) {
+    var timelineLength = environments.end - environments.start;
+    var offsetEndDate = new Date(environments.end.getTime() + timelineLength * 0.2);
+    var offsetStartDate =  new Date(environments.start.getTime() - timelineLength * 0.2);
+    uploadEventsAjax(offsetStartDate.toISOString().slice(0, 10), offsetEndDate.toISOString().slice(0, 10))
         .then(function (rows) {
             items.update(rows);
         });
@@ -120,7 +154,7 @@ function uploadEventsAjax(start_date, end_date) {
             url: 'events/' + start_date + '/' + end_date + '/',
         })
             .done(function (data) {
-                var result = convertToDistObject(data['events'])
+                var result = convertToDistObject(data['events']);
                 resolve(result);
             })
             .fail(function (data) {
