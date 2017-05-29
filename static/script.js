@@ -65,20 +65,37 @@ function initializeChart() {
             timeline.on('mouseOver', fillFullnameForm);
             timeline.on('rangechanged', UploadEventsAjax);
             timeline.on('rangechanged', UploadAndHideNestedEvents);
+            timeline.on('rangechanged', HideSmallItems);
 
         })
 }
 
+function HideSmallItems(environments) {
+    var visibleItemsIndexes = timeline.getVisibleItems();
+    visibleItemsIndexes.forEach(function (visibleItemIndex) {
+        var visibleItem = items.get(visibleItemIndex);
+        var timeline_length = environments.end - environments.start;
+        if (visibleItem.duration < timeline_length * 0.01) {
+            var t = items.remove(visibleItem);
+        }
+    });
+}
 
+///var uploadingItemIndexes = [];
 function UploadAndHideNestedEvents(environments) {
     var visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
         var timeline_length = environments.end - environments.start;
 
-        if (visibleItem.nested === null) return;
+        /*if (uploadingItemIndexes.indexOf(visibleItem.id) > 1)
+            return;*/
 
-        if ((visibleItem.nested == undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.15) {
+        if (!visibleItem || visibleItem.nested === null) return;
+
+        if ((visibleItem.nested == undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.2) {
+            //uploadingItemIndexes.push(visibleItem.id);
+
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
                     if (rows.length > 0) {
@@ -87,9 +104,19 @@ function UploadAndHideNestedEvents(environments) {
                         });
                         visibleItem.type = 'background';
                         items.update(rows);
+
+                        /*var index = uploadingItemIndexes.indexOf(visibleItem.id);
+                        if (index > -1) {
+                            uploadingItemIndexes.splice(index, 1);
+                        }*/
                     }
                     else {
                         visibleItem.nested = null;
+
+                        /*var index = uploadingItemIndexes.indexOf(visibleItem.id);
+                        if (index > -1) {
+                            uploadingItemIndexes.splice(index, 1);
+                        }*/
                     }
                     items.update(visibleItem);
                 });
@@ -104,14 +131,31 @@ function UploadAndHideNestedEvents(environments) {
 
     });
 }
+var isUploadingEventsNow = false;
+var env;
 function UploadEventsAjax(environments) {
-    var timelineLength = environments.end - environments.start;
-    var offsetEndDate = new Date(environments.end.getTime() + timelineLength * 0.2);
-    var offsetStartDate =  new Date(environments.start.getTime() - timelineLength * 0.2);
+    env = environments;
+    if (isUploadingEventsNow) {
+        env = environments;
+        return;
+    }
+    var saved_environments = env;
+    var timelineLength = saved_environments.end - saved_environments.start;
+    var offsetEndDate = new Date(saved_environments.end.getTime() + timelineLength * 0.2);
+    var offsetStartDate = new Date(saved_environments.start.getTime() - timelineLength * 0.2);
+    isUploadingEventsNow = true;
     uploadEventsAjax(offsetStartDate.toISOString().slice(0, 10), offsetEndDate.toISOString().slice(0, 10))
         .then(function (rows) {
             items.update(rows);
-        });
+            isUploadingEventsNow = false;
+        })
+        .catch(function (onRejection) {
+            isUploadingEventsNow = false;
+        })
+    setTimeout(function () {
+        if (env != saved_environments)
+            UploadEventsAjax(env);
+    }, 1000);
 }
 
 
