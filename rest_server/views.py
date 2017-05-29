@@ -46,7 +46,7 @@ def search(request):
 
     form = EventSearchForm(request.POST)
     if not form.is_valid():
-        return
+        return JsonResponse(form.errors.as_json(), safe=False, status=400)
 
     name = form.cleaned_data.get('name')
     start_date = form.cleaned_data.get('start_date')
@@ -56,19 +56,29 @@ def search(request):
     toponyms = form.cleaned_data.get('toponyms')
 
     events = Event.objects.all()
+    if name:
+        events = events.filter(name__istartswith=name)
     if start_date:
         events = events.filter(start_date__gte=start_date)
     if end_date:
         events = events.filter(end_date__lte=end_date)
     if event_types:
-        events = Event.objects.filter(event_type__in=event_types)
+        events = events.filter(event_type__in=event_types)
+    # if toponyms and persons:
+    #     events = events.filter(toponym__in=toponyms).filter(person__in=persons)
+    #     events = events.annotate(
+    #         toponyms_len=Count('toponyms'), person_len=Count('person'))
+    #     events = events.filter(
+    #         toponyms_len=len(toponyms), person_len=len(persons))
+    # else:
     if toponyms:
-        events = events.filter(toponym__in=toponyms).annotate(toponyms_len=Count('toponyms')).filter(
-            toponyms_len=len(toponyms))
-    temp = list(events)
+        for toponym in toponyms:
+            events = events.filter(toponym=toponym)
     if persons:
-        events = events.filter(person__in=persons).annotate(person_len=Count('person')).filter(
-            person_len=len(persons))
+        for person in persons:
+            events = events.filter(person=person)
+        #events = events.filter(person__in=persons).annotate(
+        #    person_len=Count('person')).filter(person_len=len(persons))
     temp = list(events)
     values = events.values('id', 'start_date', 'end_date', 'name', 'event_type', 'parent_event')
     return JsonResponse({'events': list(values)})
