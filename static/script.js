@@ -80,21 +80,22 @@ function HideSmallItems(environments) {
         }
     });
 }
-
-///var uploadingItemIndexes = [];
+var isUploadingNestedNow = false;
 function UploadAndHideNestedEvents(environments) {
+    if(isUploadingNestedNow) return;
+    isUploadingNestedNow = true;
+    setTimeout(function () {
+        isUploadingNestedNow = false;
+    }, 1000);
+
     var visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
         var timeline_length = environments.end - environments.start;
 
-        /*if (uploadingItemIndexes.indexOf(visibleItem.id) > 1)
-            return;*/
-
         if (!visibleItem || visibleItem.nested === null) return;
 
         if ((visibleItem.nested == undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.2) {
-            //uploadingItemIndexes.push(visibleItem.id);
 
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
@@ -104,19 +105,9 @@ function UploadAndHideNestedEvents(environments) {
                         });
                         visibleItem.type = 'background';
                         items.update(rows);
-
-                        /*var index = uploadingItemIndexes.indexOf(visibleItem.id);
-                        if (index > -1) {
-                            uploadingItemIndexes.splice(index, 1);
-                        }*/
                     }
                     else {
                         visibleItem.nested = null;
-
-                        /*var index = uploadingItemIndexes.indexOf(visibleItem.id);
-                        if (index > -1) {
-                            uploadingItemIndexes.splice(index, 1);
-                        }*/
                     }
                     items.update(visibleItem);
                 });
