@@ -185,8 +185,9 @@ function convertDateToRusStandart(date) {
 function uploadEventsAjax(start_date, end_date) {
     return new Promise(function (resolve, reject) {
         $.ajax({
-            type: 'GET',
+            type: 'POST',
             url: 'events/' + start_date + '/' + end_date + '/',
+            data:  $('#search').serialize()
         })
             .done(function (data) {
                 var result = convertToDistObject(data['events']);

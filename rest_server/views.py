@@ -4,6 +4,7 @@ from django.db.models import ExpressionWrapper, fields, Count
 from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_server.forms import EventSearchForm
 from rest_server.models import Event
@@ -14,6 +15,7 @@ def index(request):
     return render(request, 'index.html', {'form': event_search_form})
 
 
+@csrf_exempt
 def get_events(request, start_date, end_date):
     start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
     end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
