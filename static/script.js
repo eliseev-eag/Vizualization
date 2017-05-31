@@ -38,8 +38,8 @@ function initializeChart() {
         maxHeight: '400px',
         type: 'range',
         orientation: {axis: 'both'},
-        dataAttributes:['id'],
-        snap:null,
+        dataAttributes: ['id'],
+        snap: null,
         zoomMin: 1000 * 60 * 60 * 24 * 5,
         max: Date.now(),
         min: new Date(100, 0, 0)
@@ -90,8 +90,21 @@ function HideSmallItems(environments) {
         }
     });
 }
+
 var isUploadingNestedNow = false;
+var nested_env;
 function UploadAndHideNestedEvents(environments) {
+    nested_env = environments;
+    if (isUploadingNestedNow) {
+        return;
+    }
+    var saved_environments = environments;
+    setTimeout(function () {
+        if (saved_environments != nested_env)
+            this(saved_environments);
+
+    }, 800);
+
     var visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
@@ -104,16 +117,11 @@ function UploadAndHideNestedEvents(environments) {
             visibleItem.nested = [];
             visibleItem.type = 'range';
             items.update(visibleItem);
+            return;
         }
 
         if ((visibleItem.nested == undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.2) {
-            if (isUploadingNestedNow) return;
-
             isUploadingNestedNow = true;
-            setTimeout(function () {
-                isUploadingNestedNow = false;
-            }, 800);
-
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
                     if (rows.length > 0) {
@@ -127,6 +135,7 @@ function UploadAndHideNestedEvents(environments) {
                         visibleItem.nested = null;
                     }
                     items.update(visibleItem);
+                    isUploadingNestedNow = false;
                 });
         }
     });
@@ -136,7 +145,6 @@ var env;
 function UploadEventsAjax(environments) {
     env = environments;
     if (isUploadingEventsNow) {
-        env = environments;
         return;
     }
     var saved_environments = env;
