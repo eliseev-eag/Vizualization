@@ -13,15 +13,17 @@ body, html {
     position: absolute;
     background: white;
     border: solid 1px #bdbdbd;
-    width: 245px;
+    width: 260px;
     font-size: 12px;
     z-index: 50;
+    box-shadow: 0 0 5px gray;
 }
 
 #eventname {
     text-align: center;
     font-size: 14px;
     font-weight: bold;
+    padding: 5px;
 }
 
 .dates {
@@ -44,7 +46,7 @@ hr {
 
 /* Общие стили для vis.js объектов */
 .vis-timeline {
-    border: none;
+    /*border: none;*/
 }
 
 .vis-item {
@@ -61,40 +63,46 @@ hr {
     opacity: 1;
 }
 
-.vis-background .vis-item-content:hover {
+.vis-background .vis-item-content{
     font-size: 14pt;
     text-shadow: 1px 1px 2px gray;
     z-index: 50;
 }
+/*
+.vis-background{
+    font-size: 14pt;
+    text-shadow: 1px 1px 2px gray;
+    color: lightgray;
+}*/
 
 
 /* Стили для className item-ов */
 .red {
-    background-color: red;
+    background: red;
     border-color: darkred;
     color: white;
 }
 
 .blue {
-    background-color: rgb(66, 133, 244);
+    background: rgb(66, 133, 244);
     border-color: darkblue;
     color: white;
 }
 
 .purple {
-    background-color: rgb(171, 71, 188);
+    background: rgb(171, 71, 188);
     border-color: darkmagenta;
     color: white;
 }
 
 .green {
-    background-color: rgb(15, 157, 88);
+    background: rgb(15, 157, 88);
     border-color: darkgreen;
     color: white;
 }
 
 .yellow {
-    background-color: rgb(244, 180, 0);
+    background: rgb(244, 180, 0);
     border-color: darkgoldenrod;
     color: black;
 }

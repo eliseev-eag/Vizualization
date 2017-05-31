@@ -36,8 +36,8 @@ function initializeChart() {
 
     var options = {
         align: 'center',
-        minHeight: '500px',
-        maxHeight: '500px',
+        minHeight: '400px',
+        maxHeight: '400px',
         type: 'range',
         orientation: {axis: 'both'},
         zoomMin: 1000 * 60 * 60 * 24 * 5,
@@ -57,8 +57,6 @@ function initializeChart() {
                 groupItem.content = eventTypesItem;
                 groupItem.class = classes[Math.floor(Math.random() * classes.length)];
                 groupItem.visible = true;
-                dropdown_menu.append(
-                    '<li><label class="checkbox-inline"><input type="checkbox" value="' + groupItem.id + '">' + groupItem.content + '</label></li>');
                 return groupItem;
             });
 
@@ -72,16 +70,6 @@ function initializeChart() {
             timeline.on('rangechanged', UploadEventsAjax);
             timeline.on('rangechanged', UploadAndHideNestedEvents);
             timeline.on('rangechanged', HideSmallItems);
-
-
-            $(":checkbox").change(function () {
-                var groupId = $(this).val();
-                var group = groups.get(groupId);
-                var isVisible = !group.visible;
-                group.visible = isVisible;
-                groups.update(groupId);
-            });
-
         })
 }
 
