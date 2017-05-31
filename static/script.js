@@ -9,7 +9,7 @@ window.onload = function () {
         search(searchForm);
         return false;
     });
-}
+};
 
 function search(searchForm) {
     $.ajax({
@@ -50,22 +50,37 @@ function initializeChart() {
         url: 'event_types',
     })
         .done(function (eventTypes) {
+            var dropdown_menu = $('.dropdown-menu');
             var groupsItemsArray = eventTypes.map(function (eventTypesItem) {
                 var groupItem = {};
                 groupItem.id = eventTypesItem;
                 groupItem.content = eventTypesItem;
                 groupItem.class = classes[Math.floor(Math.random() * classes.length)];
+                groupItem.visible = true;
+                dropdown_menu.append(
+                    '<li><label class="checkbox-inline"><input type="checkbox" value="' + groupItem.id + '">' + groupItem.content + '</label></li>');
                 return groupItem;
             });
+
 
             groups = new vis.DataSet(groupsItemsArray);
 
             timeline = new vis.Timeline(container, items, groups, options);
 
+
             timeline.on('mouseOver', fillFullnameForm);
             timeline.on('rangechanged', UploadEventsAjax);
             timeline.on('rangechanged', UploadAndHideNestedEvents);
             timeline.on('rangechanged', HideSmallItems);
+
+
+            $(":checkbox").change(function () {
+                var groupId = $(this).val();
+                var group = groups.get(groupId);
+                var isVisible = !group.visible;
+                group.visible = isVisible;
+                groups.update(groupId);
+            });
 
         })
 }
@@ -82,7 +97,7 @@ function HideSmallItems(environments) {
 }
 var isUploadingNestedNow = false;
 function UploadAndHideNestedEvents(environments) {
-    if(isUploadingNestedNow) return;
+    if (isUploadingNestedNow) return;
     isUploadingNestedNow = true;
     setTimeout(function () {
         isUploadingNestedNow = false;
@@ -187,7 +202,7 @@ function uploadEventsAjax(start_date, end_date) {
         $.ajax({
             type: 'POST',
             url: 'events/' + start_date + '/' + end_date + '/',
-            data:  $('#search').serialize()
+            data: $('#search').serialize()
         })
             .done(function (data) {
                 var result = convertToDistObject(data['events']);
