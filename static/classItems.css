@@ -1,0 +1,35 @@
+/* Стили для className item-ов */
+.red {
+    background: red;
+    border-color: darkred;
+    color: white;
+}
+
+.blue {
+    background: rgb(66, 133, 244);
+    border-color: darkblue;
+    color: white;
+}
+
+.purple {
+    background: rgb(171, 71, 188);
+    border-color: darkmagenta;
+    color: white;
+}
+
+.green {
+    background: rgb(15, 157, 88);
+    border-color: darkgreen;
+    color: white;
+}
+
+.yellow {
+    background: rgb(244, 180, 0);
+    border-color: darkgoldenrod;
+    color: black;
+}
+
+.red:hover, .blue:hover, .green:hover, .purple:hover, .yellow:hover {
+    color: black;
+    opacity: 0.75;
+}

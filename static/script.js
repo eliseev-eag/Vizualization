@@ -10,6 +10,33 @@ window.onload = function () {
         return false;
     });
 };
+/*
+$(document).ready(function () {
+    $(document).on('mouseenter', '.vis-item.vis-background .vis-item-overflow', function (event) {
+        var fullname = document.getElementById('fullname');
+        var eventname = document.getElementById('eventname');
+        var spanWithStartDate = document.getElementById('start');
+        var spanWithEndDate = document.getElementById('end');
+        var spanWithDurationTime = document.getElementById('duration');
+
+        var selectedEvent = items.get({
+            filter: function (item) {
+                return (item.content == $(this).text());
+            }
+        });
+        eventname.innerHTML = selectedEvent.content;
+        spanWithStartDate.innerHTML = convertDateToRusStandart(selectedEvent.start);
+        spanWithEndDate.innerHTML = convertDateToRusStandart(selectedEvent.end);
+        var millisecInDay = 1000 * 60 * 60 * 24;
+        spanWithDurationTime.innerHTML = Math.floor(selectedEvent.duration / millisecInDay);
+
+        fullname.style.left = event.pageX + 'px';
+        fullname.style.top = event.pageY + 'px';
+        if ($(fullname).width() + event.pageX > $(window).width())
+            fullname.style.left = $(window).width() - $(fullname).width() - 10 + 'px';
+        fullname.style.display = 'block';
+    });
+});*/
 
 function search(searchForm) {
     $.ajax({
@@ -66,7 +93,12 @@ function initializeChart() {
             timeline = new vis.Timeline(container, items, groups, options);
 
 
-            timeline.on('mouseOver', fillFullnameForm);
+            timeline.on('mouseOver', function (environments) {
+                FillFullnameForm(items.get(environments.item), environments.pageX, environments.pageY,
+                    function () {
+                        return environments.what != 'item';
+                    });
+            });
             timeline.on('rangechanged', UploadEventsAjax);
             timeline.on('rangechanged', UploadAndHideNestedEvents);
             timeline.on('rangechanged', HideSmallItems);
@@ -145,45 +177,12 @@ function UploadEventsAjax(environments) {
         })
         .catch(function (onRejection) {
             isUploadingEventsNow = false;
-        })
+        });
     setTimeout(function () {
         if (env != saved_environments)
             UploadEventsAjax(env);
-    }, 1000);
+    }, 800);
 }
-
-
-function fillFullnameForm(environments) {
-    var fullname = document.getElementById('fullname');
-    var eventname = document.getElementById('eventname');
-    var spanWithStartDate = document.getElementById('start');
-    var spanWithEndDate = document.getElementById('end');
-    var spanWithDurationTime = document.getElementById('duration');
-
-    if (environments.what == 'item') {
-        var selectedEvent = items.get(environments.item);
-        eventname.innerHTML = selectedEvent.content;
-        spanWithStartDate.innerHTML = convertDateToRusStandart(selectedEvent.start);
-        spanWithEndDate.innerHTML = convertDateToRusStandart(selectedEvent.end);
-        var millisecInDay = 1000 * 60 * 60 * 24;
-        spanWithDurationTime.innerHTML = Math.floor(selectedEvent.duration / millisecInDay);
-
-        fullname.style.left = environments.pageX + 'px';
-        fullname.style.top = environments.pageY + 'px';
-        if ($(fullname).width() + environments.pageX > $(window).width())
-            fullname.style.left = $(window).width() - $(fullname).width() - 10 + 'px';
-        fullname.style.display = 'block';
-    }
-    else
-        fullname.style.display = 'none';
-}
-
-
-function convertDateToRusStandart(date) {
-    var splittedDate = date.split('-');
-    return splittedDate[2] + '.' + splittedDate[1] + '.' + splittedDate[0];
-}
-
 
 function uploadEventsAjax(start_date, end_date) {
     return new Promise(function (resolve, reject) {

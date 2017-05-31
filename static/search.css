@@ -1,0 +1,33 @@
+/* Стили  для виджетов поиска */
+form {
+    margin: 10px 10%;
+}
+
+.form-group {
+    margin: 5px 5px;
+}
+
+.well {
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+#id_toponyms, #id_persons, #id_event_type {
+    width: 100%;
+}
+
+#id_name {
+    margin: 10px 0;
+    width: 90%;
+}
+
+#filters_btn {
+    margin-top: 10px;
+}
+
+#find_btn
+{
+    margin-left: 20px;
+}
