@@ -10,33 +10,6 @@ window.onload = function () {
         return false;
     });
 };
-/*
-$(document).ready(function () {
-    $(document).on('mouseenter', '.vis-item.vis-background .vis-item-overflow', function (event) {
-        var fullname = document.getElementById('fullname');
-        var eventname = document.getElementById('eventname');
-        var spanWithStartDate = document.getElementById('start');
-        var spanWithEndDate = document.getElementById('end');
-        var spanWithDurationTime = document.getElementById('duration');
-
-        var selectedEvent = items.get({
-            filter: function (item) {
-                return (item.content == $(this).text());
-            }
-        });
-        eventname.innerHTML = selectedEvent.content;
-        spanWithStartDate.innerHTML = convertDateToRusStandart(selectedEvent.start);
-        spanWithEndDate.innerHTML = convertDateToRusStandart(selectedEvent.end);
-        var millisecInDay = 1000 * 60 * 60 * 24;
-        spanWithDurationTime.innerHTML = Math.floor(selectedEvent.duration / millisecInDay);
-
-        fullname.style.left = event.pageX + 'px';
-        fullname.style.top = event.pageY + 'px';
-        if ($(fullname).width() + event.pageX > $(window).width())
-            fullname.style.left = $(window).width() - $(fullname).width() - 10 + 'px';
-        fullname.style.display = 'block';
-    });
-});*/
 
 function search(searchForm) {
     $.ajax({
@@ -45,14 +18,12 @@ function search(searchForm) {
         data: searchForm.serialize(),
     })
         .done(function (data) {
-            console.log(data);
-            timeline.off('rangechanged', UploadEventsAjax);
             items.clear();
             var result = convertToDistObject(data['events'])
             items.update(result);
         })
         .fail(function (data) {
-            timeline.on('rangechanged', UploadEventsAjax);
+            console.log(data);
             items.clear();
         });
 }
@@ -67,7 +38,11 @@ function initializeChart() {
         maxHeight: '400px',
         type: 'range',
         orientation: {axis: 'both'},
+        dataAttributes:['id'],
+        snap:null,
         zoomMin: 1000 * 60 * 60 * 24 * 5,
+        max: Date.now(),
+        min: new Date(100, 0, 0)
     };
 
     var classes = ['blue', 'red', 'purple', 'yellow', 'green'];
@@ -110,19 +85,13 @@ function HideSmallItems(environments) {
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
         var timeline_length = environments.end - environments.start;
-        if (visibleItem.duration < timeline_length * 0.01) {
+        if (visibleItem.duration < timeline_length * 0.03) {
             var t = items.remove(visibleItem);
         }
     });
 }
 var isUploadingNestedNow = false;
 function UploadAndHideNestedEvents(environments) {
-    if (isUploadingNestedNow) return;
-    isUploadingNestedNow = true;
-    setTimeout(function () {
-        isUploadingNestedNow = false;
-    }, 1000);
-
     var visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
@@ -130,7 +99,20 @@ function UploadAndHideNestedEvents(environments) {
 
         if (!visibleItem || visibleItem.nested === null) return;
 
+        if (visibleItem.duration < timeline_length * 0.15 && visibleItem.type == 'background') {
+            items.remove(visibleItem.nested);
+            visibleItem.nested = [];
+            visibleItem.type = 'range';
+            items.update(visibleItem);
+        }
+
         if ((visibleItem.nested == undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.2) {
+            if (isUploadingNestedNow) return;
+
+            isUploadingNestedNow = true;
+            setTimeout(function () {
+                isUploadingNestedNow = false;
+            }, 800);
 
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
@@ -147,14 +129,6 @@ function UploadAndHideNestedEvents(environments) {
                     items.update(visibleItem);
                 });
         }
-
-        if (visibleItem.duration < timeline_length * 0.07 && visibleItem.type == 'background') {
-            items.remove(visibleItem.nested);
-            visibleItem.nested = [];
-            visibleItem.type = 'range';
-            items.update(visibleItem);
-        }
-
     });
 }
 var isUploadingEventsNow = false;
