@@ -98,12 +98,6 @@ function UploadAndHideNestedEvents(environments) {
     if (isUploadingNestedNow) {
         return;
     }
-    var saved_environments = environments;
-    setTimeout(function () {
-        if (saved_environments != nested_env)
-            this(saved_environments);
-
-    }, 800);
 
     var visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
@@ -121,6 +115,7 @@ function UploadAndHideNestedEvents(environments) {
         }
 
         if ((visibleItem.nested == undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.2) {
+            var saved_environments = environments;
             isUploadingNestedNow = true;
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
@@ -138,6 +133,12 @@ function UploadAndHideNestedEvents(environments) {
                     isUploadingNestedNow = false;
                 });
         }
+
+        setTimeout(function () {
+            if (saved_environments != nested_env)
+                UploadAndHideNestedEvents(saved_environments);
+        }, 800);
+
     });
 }
 var isUploadingEventsNow = false;
