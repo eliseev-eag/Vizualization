@@ -27,7 +27,7 @@
 </body>
 <div class="container-fluid">
     <div class="row">
-        <form id="search" method="POST" action="{% url 'search' %}" class="post-form form-inline">{% csrf_token %}
+        <form id="search" method="POST" action="{% url 'search' %}" class="post-form form-inline">
             <div class="row">
                 {{ form.name }}
                 <button id="find_btn" type="submit" class="save btn btn-success">Найти</button>

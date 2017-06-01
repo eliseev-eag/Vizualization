@@ -74,6 +74,7 @@ def search_F(request, events):
     return events
 
 
+@csrf_exempt
 def search(request):
     if request.method != "POST":
         return None
