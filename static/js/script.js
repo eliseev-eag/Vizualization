@@ -39,7 +39,6 @@ function initializeChart() {
         type: 'range',
         orientation: {axis: 'both'},
         dataAttributes: ['id'],
-        snap: null,
         zoomMin: 1000 * 60 * 60 * 24 * 5,
         max: Date.now(),
         min: new Date(100, 0, 0)
@@ -85,7 +84,7 @@ function HideSmallItems(environments) {
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
         var timeline_length = environments.end - environments.start;
-        if (visibleItem.duration < timeline_length * 0.03) {
+        if (visibleItem.duration < timeline_length * 0.008) {
             var t = items.remove(visibleItem);
         }
     });
@@ -132,13 +131,12 @@ function UploadAndHideNestedEvents(environments) {
                     items.update(visibleItem);
                     isUploadingNestedNow = false;
                 });
+
+            setTimeout(function () {
+                if (saved_environments != nested_env)
+                    UploadAndHideNestedEvents(saved_environments);
+            }, 800);
         }
-
-        setTimeout(function () {
-            if (saved_environments != nested_env)
-                UploadAndHideNestedEvents(saved_environments);
-        }, 800);
-
     });
 }
 var isUploadingEventsNow = false;

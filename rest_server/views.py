@@ -20,7 +20,7 @@ def get_events(request, start_date, end_date):
     start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
     end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-    timeline_length = ((end_date - start_date) * 0.08)
+    timeline_length = ((end_date - start_date) * 0.02)
     duration = ExpressionWrapper(F('end_date') - F('start_date'), output_field=fields.DurationField())
     events = Event.objects.annotate(duration=duration).filter(end_date__gte=start_date,
                                                               start_date__lte=end_date,
