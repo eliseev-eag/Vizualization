@@ -2,14 +2,18 @@ var items;
 var timeline;
 var groups;
 
-window.onload = function () {
-    init();
+$(document).ready(function () {
+    $('#start_date').datetimepicker({locale: 'ru', format: 'L'});
+    $('#end_date').datetimepicker({locale: 'ru', format: 'L'});
+
     var searchForm = $('#search');
     searchForm.submit(function () {
         search(searchForm);
         return false;
     });
-};
+
+    init();
+});
 
 function search(searchForm) {
     $.ajax({
@@ -142,32 +146,30 @@ function UploadAndHideNestedEvents(environments) {
 
 var isUploadingEventsNow = false;
 var env;
+var saved_env;
 function UploadEventsAjax(environments) {
     env = environments;
     if (isUploadingEventsNow) {
         return;
     }
-    var saved_env = environments;
+
+    isUploadingEventsNow = true;
+    saved_env = environments;
     var timelineLength = saved_env.end - saved_env.start;
     var offsetEndDate = new Date(saved_env.end.getTime() + timelineLength * 0.2);
     var offsetStartDate = new Date(saved_env.start.getTime() - timelineLength * 0.2);
-    isUploadingEventsNow = true;
-    saved_env = environments;
+
     uploadEventsAjax(offsetStartDate.toISOString().slice(0, 10), offsetEndDate.toISOString().slice(0, 10))
         .then(function (rows) {
             items.update(rows);
             isUploadingEventsNow = false;
-        })
-        .catch(function (onRejection) {
-            isUploadingEventsNow = false;
-        });
-    setTimeout(function () {
-        if (saved_env != env){
-            saved_env = env;
-            UploadEventsAjax(saved_env);
-        }
 
-    }, 1000);
+            /*if (saved_env != env) {
+             saved_env = env;
+             UploadEventsAjax(saved_env);
+             }*/
+        });
+
 }
 
 function uploadEventsAjax(start_date, end_date) {

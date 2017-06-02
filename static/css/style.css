@@ -1,7 +1,7 @@
 body, html {
     font-family: "Helvetica", "Arial", sans-serif;
     font-size: 11pt;
-    background-color: #f0f0f0;
+   /* background-color: #f0f0f0;*/
 }
 #fullname, .div-range, .btn {
     border-radius: 4px
@@ -39,3 +39,11 @@ body, html {
     text-shadow: 1px 1px 2px gray;
     color: lightgray;
 }*/
+
+.tab-content{
+    /*background: white;*/
+    background-color: #f0f0f0;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
