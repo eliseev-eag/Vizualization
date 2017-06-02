@@ -1,0 +1,63 @@
+{% load static %}
+
+<script type="text/javascript" src="{% static 'js/moment-with-locales.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.min.js' %}"></script>
+
+<link rel="stylesheet" href="{% static 'css/bootstrap-datetimepicker.css' %}">
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+
+<form id="search" method="POST" action="{% url 'search' %}" class="post-form form-inline">
+    <div class="row">
+        {{ form.name }}
+        <button id="find_btn" type="submit" class="save btn btn-success">Найти</button>
+    </div>
+    <div class="row">
+        <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#filters"
+                aria-expanded="false" aria-controls="collapseExample" id="filters_btn">
+            Фильтры <span class="caret"></span>
+        </button>
+        <div class="collapse" id="filters">
+            <div class="well">
+                <!--- Datepicker widget !-->
+                <div class="form-group">
+                    <label class="control-label"
+                           for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }}</label>
+                    <br>
+                    <div class='input-group date' id='start_date'>
+                        {{ form.start_date }}
+                        <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+                             </span>
+                    </div>
+                </div>
+                <!--- Datepicker widget !-->
+
+                <!--- Datepicker widget !-->
+                <div class="form-group">
+                    <label class="control-label"
+                           for="{{ form.end_date.id_for_label }}">{{ form.end_date.label }}</label>
+                    <br>
+                    <div class='input-group date' id='end_date'>
+                        {{ form.end_date }}
+                        <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+                             </span>
+                    </div>
+                </div>
+                <!--- Datepicker widget !-->
+
+                {% for field in form %}
+                    {% if field.name != 'name' and field.name != 'start_date'  and field.name != 'end_date' %}
+                        <div class="form-group">
+                            <label class="control-label"
+                                   for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            <br>
+                            {{ field }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</form>

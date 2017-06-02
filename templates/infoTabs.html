@@ -1,0 +1,23 @@
+{% load static %}
+<script type="text/javascript" src="{% static 'js/infoTabs.js' %}"></script>
+
+<div class="container" id="info_tabs">
+    <a href="#" id="btnAdd"><i class="icon-plus-sign-alt"></i> Add Tab</a>
+    <br><br>
+
+
+    <ul class="nav nav-tabs nav-justified" role="tablist" id="tabs">
+        <li role="presentation" class="active">
+            <a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">
+                Помощь
+                <button class="close closeTab" type="button">×</button>
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="tab1">
+            Кликните на интересующем вас событии для отобажения дополнительной информации
+        </div>
+    </div>
+</div>

@@ -2,6 +2,21 @@ var items;
 var timeline;
 var groups;
 
+var maxDate = new Date();
+maxDate.setFullYear(maxDate.getFullYear() + 5);
+var options = {
+    align: 'center',
+    minHeight: '400px',
+    maxHeight: '400px',
+    type: 'range',
+    snap: null,
+    orientation: {axis: 'both'},
+    dataAttributes: ['id'],
+    zoomMin: 1000 * 60 * 60 * 24 * 5,
+    max: maxDate,
+    min: new Date(100, 0, 0)
+};
+
 $(document).ready(function () {
     $('#start_date').datetimepicker({locale: 'ru', format: 'L'});
     $('#end_date').datetimepicker({locale: 'ru', format: 'L'});
@@ -55,17 +70,6 @@ function init() {
 function initializeChart(groupsItemsArray) {
     var container = document.getElementById('graph');
 
-    var options = {
-        align: 'center',
-        minHeight: '400px',
-        maxHeight: '400px',
-        type: 'range',
-        orientation: {axis: 'both'},
-        dataAttributes: ['id'],
-        zoomMin: 1000 * 60 * 60 * 24 * 5,
-        max: Date.now(),
-        min: new Date(100, 0, 0)
-    };
 
     items = new vis.DataSet();
     groups = new vis.DataSet(groupsItemsArray);
@@ -158,6 +162,10 @@ function UploadEventsAjax(environments) {
     var timelineLength = saved_env.end - saved_env.start;
     var offsetEndDate = new Date(saved_env.end.getTime() + timelineLength * 0.2);
     var offsetStartDate = new Date(saved_env.start.getTime() - timelineLength * 0.2);
+    if (offsetStartDate < options.min)
+        offsetStartDate = options.min;
+    if (offsetEndDate > options.max)
+        offsetEndDate = options.max;
 
     uploadEventsAjax(offsetStartDate.toISOString().slice(0, 10), offsetEndDate.toISOString().slice(0, 10))
         .then(function (rows) {
