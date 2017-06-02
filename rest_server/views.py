@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db.models import ExpressionWrapper, fields, Count
+from django.db.models import ExpressionWrapper, fields, Count, Max, Min
 from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -26,7 +26,7 @@ def get_events(request, start_date, end_date):
                                                               start_date__lte=end_date,
                                                               duration__gte=timeline_length,
                                                               parent_event__isnull=True)
-    events = search_F(request, events)
+    events = search_filters(request, events)
     values = events.values('id', 'start_date', 'end_date', 'name', 'event_type', 'parent_event')
     return JsonResponse({'events': list(values)})
 
@@ -43,7 +43,7 @@ def get_event_types(request):
     return JsonResponse(list(event_types), safe=False)
 
 
-def search_F(request, events):
+def search_filters(request, events):
     if request.method != "POST":
         return events
 
@@ -81,31 +81,12 @@ def search(request):
 
     form = EventSearchForm(request.POST)
     if not form.is_valid():
-        for k, v in form.errors.items():
-            a = {k: v}
-        return JsonResponse(a, safe=False, status=400)
-
-    name = form.cleaned_data.get('name')
-    start_date = form.cleaned_data.get('start_date')
-    end_date = form.cleaned_data.get('end_date')
-    event_types = form.cleaned_data.get('event_type')
-    persons = form.cleaned_data.get('persons')
-    toponyms = form.cleaned_data.get('toponyms')
+        return None
 
     events = Event.objects.all()
-    if name:
-        events = events.filter(name__istartswith=name)
-    if start_date:
-        events = events.filter(start_date__gte=start_date)
-    if end_date:
-        events = events.filter(end_date__lte=end_date)
-    if event_types:
-        events = events.filter(event_type__in=event_types)
-    if toponyms:
-        for toponym in toponyms:
-            events = events.filter(toponym=toponym)
-    if persons:
-        for person in persons:
-            events = events.filter(person=person)
+    events = search_filters(request, events)
+    dates_boundary_values = events.aggregate(Max('end_date'), Min('start_date'))
+    events = events.order_by('start_date')[:100]
     values = events.values('id', 'start_date', 'end_date', 'name', 'event_type', 'parent_event')
-    return JsonResponse({'events': list(values)})
+    return JsonResponse({'events': list(values), 'max_date': dates_boundary_values['end_date__max'],
+                         'min_date': dates_boundary_values['start_date__min']})

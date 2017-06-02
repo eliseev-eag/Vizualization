@@ -2,8 +2,10 @@ var items;
 var timeline;
 var groups;
 
-var maxDate = new Date();
-maxDate.setFullYear(maxDate.getFullYear() + 5);
+var defaultMaxDate = new Date();
+defaultMaxDate.setFullYear(defaultMaxDate.getFullYear() + 5);
+
+const defaultMinDate = new Date(100, 0, 0);
 var options = {
     align: 'center',
     minHeight: '400px',
@@ -13,8 +15,8 @@ var options = {
     orientation: {axis: 'both'},
     dataAttributes: ['id'],
     zoomMin: 1000 * 60 * 60 * 24 * 5,
-    max: maxDate,
-    min: new Date(100, 0, 0)
+    max: defaultMaxDate,
+    min: defaultMinDate
 };
 
 $(document).ready(function () {
@@ -38,7 +40,16 @@ function search(searchForm) {
     })
         .done(function (data) {
             items.clear();
-            var result = convertToDistObject(data['events'])
+            var min_date = new Date(data['min_date']);
+            min_date.setFullYear(min_date.getFullYear() - 5);
+            var max_date = new Date(data['max_date']);
+            max_date.setFullYear(max_date.getFullYear() + 5);
+            options.min = min_date;
+            options.max = max_date;
+            timeline.setOptions(options);
+            var result = convertToDistObject(data['events']);
+            timeline.moveTo(data['min_date']);
+            //HideSmallItems(options.min, options.max);
             items.update(result);
         })
         .fail(function (data) {
@@ -84,14 +95,16 @@ function initializeChart(groupsItemsArray) {
     });
     timeline.on('rangechanged', UploadEventsAjax);
     timeline.on('rangechanged', UploadAndHideNestedEvents);
-    timeline.on('rangechanged', HideSmallItems);
+    timeline.on('rangechanged', function (environments) {
+        HideSmallItems(environments.end, environments.start);
+    });
 }
 
-function HideSmallItems(environments) {
+function HideSmallItems(end, start) {
     var visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
-        var timeline_length = environments.end - environments.start;
+        var timeline_length = end - start;
         if (visibleItem.duration < timeline_length * 0.008) {
             var t = items.remove(visibleItem);
         }
@@ -151,6 +164,7 @@ function UploadAndHideNestedEvents(environments) {
 var isUploadingEventsNow = false;
 var env;
 var saved_env;
+
 function UploadEventsAjax(environments) {
     env = environments;
     if (isUploadingEventsNow) {
@@ -160,25 +174,19 @@ function UploadEventsAjax(environments) {
     isUploadingEventsNow = true;
     saved_env = environments;
     var timelineLength = saved_env.end - saved_env.start;
-    var offsetEndDate = new Date(saved_env.end.getTime() + timelineLength * 0.2);
-    var offsetStartDate = new Date(saved_env.start.getTime() - timelineLength * 0.2);
-    if (offsetStartDate < options.min)
-        offsetStartDate = options.min;
-    if (offsetEndDate > options.max)
-        offsetEndDate = options.max;
+    var dateTime = extractTimelineLenght(timelineLength);
+    var offsetEndDate = dateTime.offsetEndDate;
+    var offsetStartDate = dateTime.offsetStartDate;
 
     uploadEventsAjax(offsetStartDate.toISOString().slice(0, 10), offsetEndDate.toISOString().slice(0, 10))
         .then(function (rows) {
             items.update(rows);
             isUploadingEventsNow = false;
-
-            /*if (saved_env != env) {
-             saved_env = env;
-             UploadEventsAjax(saved_env);
-             }*/
         });
 
 }
+
+
 
 function uploadEventsAjax(start_date, end_date) {
     return new Promise(function (resolve, reject) {
@@ -213,6 +221,15 @@ function uploadNestedEventsAjax(parent_event_id) {
     })
 }
 
+function extractTimelineLenght(timelineLength) {
+    var offsetEndDate = new Date(saved_env.end.getTime() + timelineLength * 0.2);
+    var offsetStartDate = new Date(saved_env.start.getTime() - timelineLength * 0.2);
+    if (offsetStartDate < options.min)
+        offsetStartDate = options.min;
+    if (offsetEndDate > options.max)
+        offsetEndDate = options.max;
+    return {offsetEndDate: offsetEndDate, offsetStartDate: offsetStartDate};
+}
 
 function convertToDistObject(items) {
     items.forEach(function (item) {

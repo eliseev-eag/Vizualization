@@ -9,7 +9,7 @@ class Event(models.Model):
     parent_event = models.ForeignKey('self', null=True, blank=True)
     article_id = models.BigIntegerField(blank=True, null=True)
     event_type = models.CharField(max_length=15000, blank=True, default='(Без категории)')
-    sentence = models.CharField(max_length=20000, blank=True)
+    sentence = models.CharField(max_length=20000, blank=True,null=True)
     toponyms = models.ManyToManyField('Toponym', blank=True)
     persons = models.ManyToManyField('Person', blank=True)
 
