@@ -32,13 +32,30 @@ $(document).ready(function () {
     init();
 });
 
+var serializedSearchForm = null;
 function search(searchForm) {
+
+    if (searchForm.serializeArray().every(function (element) {
+            return element.value == ''
+        })) {
+        serializedSearchForm = null;
+        items.clear();
+        options.min = defaultMinDate;
+        options.max = defaultMaxDate;
+        timeline.setOptions(options);
+        timeline.moveTo(Date.now());
+        timeline.on('rangechanged', HideItems);
+        return;
+    }
+
+    serializedSearchForm = searchForm.serialize();
     $.ajax({
         type: searchForm.attr('method'),
         url: searchForm.attr('action'),
-        data: searchForm.serialize(),
+        data: serializedSearchForm,
     })
         .done(function (data) {
+            timeline.off('rangechanged', HideItems);
             items.clear();
             var min_date = new Date(data['min_date']);
             min_date.setFullYear(min_date.getFullYear() - 5);
@@ -49,12 +66,7 @@ function search(searchForm) {
             timeline.setOptions(options);
             var result = convertToDistObject(data['events']);
             timeline.moveTo(data['min_date']);
-            //HideSmallItems(options.min, options.max);
             items.update(result);
-        })
-        .fail(function (data) {
-            console.log(data);
-            items.clear();
         });
 }
 
@@ -95,12 +107,12 @@ function initializeChart(groupsItemsArray) {
     });
     timeline.on('rangechanged', UploadEventsAjax);
     timeline.on('rangechanged', UploadAndHideNestedEvents);
-    timeline.on('rangechanged', function (environments) {
-        HideSmallItems(environments.end, environments.start);
-    });
+    timeline.on('rangechanged', HideItems);
 }
-
-function HideSmallItems(end, start) {
+function HideItems(environments) {
+    hideSmallItems(environments.end, environments.start);
+}
+function hideSmallItems(end, start) {
     var visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
         var visibleItem = items.get(visibleItemIndex);
@@ -187,13 +199,20 @@ function UploadEventsAjax(environments) {
 }
 
 
-
 function uploadEventsAjax(start_date, end_date) {
     return new Promise(function (resolve, reject) {
+        var requestType = 'GET';
+        var requestData = null;
+
+        if (serializedSearchForm != null) {
+            requestType = 'POST';
+            requestData = serializedSearchForm;
+        }
+
         $.ajax({
-            type: 'POST',
+            type: requestType,
             url: 'events/' + start_date + '/' + end_date + '/',
-            data: $('#search').serialize()
+            data: requestData
         })
             .done(function (data) {
                 var result = convertToDistObject(data['events']);

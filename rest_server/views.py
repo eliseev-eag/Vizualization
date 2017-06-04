@@ -22,10 +22,11 @@ def get_events(request, start_date, end_date):
 
     timeline_length = ((end_date - start_date) * 0.02)
     duration = ExpressionWrapper(F('end_date') - F('start_date'), output_field=fields.DurationField())
-    events = Event.objects.annotate(duration=duration).filter(end_date__gte=start_date,
-                                                              start_date__lte=end_date,
-                                                              duration__gte=timeline_length,
-                                                              parent_event__isnull=True)
+
+    events = Event.objects.filter(end_date__gte=start_date,
+                                  start_date__lte=end_date,
+                                  parent_event__isnull=True)
+    events = events.annotate(duration=duration).filter(duration__gte=timeline_length)
     events = search_filters(request, events)
     values = events.values('id', 'start_date', 'end_date', 'name', 'event_type', 'parent_event')
     return JsonResponse({'events': list(values)})
@@ -58,7 +59,7 @@ def search_filters(request, events):
     toponyms = form.cleaned_data.get('toponyms')
 
     if name:
-        events = events.filter(name__istartswith=name)
+        events = events.filter(name__icontains=name)
     if start_date:
         events = events.filter(start_date__gte=start_date)
     if end_date:

@@ -32,14 +32,3 @@ class EventSearchForm(forms.ModelForm):
                 'class': 'form-control'
             })
         self.fields['event_type'].choices = Event.objects.values_list('event_type', 'event_type').distinct()
-    #
-    # def clean(self):
-    #     cleaned_data = super(EventSearchForm, self).clean()
-    #     form_empty = True
-    #     for field_value in cleaned_data.values():
-    #         if field_value and field_value[0] != '':
-    #             form_empty = False
-    #             break
-    #     if form_empty:
-    #         raise forms.ValidationError(ugettext_lazy("Пожалуйста, введите название или выберите фильтры"))
-    #     return cleaned_data  # Important that clean should return cleaned_data!
