@@ -40,10 +40,26 @@ body, html {
     color: lightgray;
 }*/
 
+#info_tabs{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
 .tab-content{
     /*background: white;*/
     /*background-color: #f0f0f0;*/
     padding: 10px;
     margin-top: 10px;
     margin-bottom: 20px;
+}
+
+.tab-content h4{
+    text-align: center;
+    font-size: 16pt;
+}
+
+.tab-content div{
+    margin-left: 30px;
+    margin-top: 20px;
+    font-size: 14pt;
 }

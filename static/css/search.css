@@ -15,7 +15,7 @@ form {
 }
 
 #id_toponyms, #id_persons, #id_event_type {
-    width: 100%;
+    width: 200px;
 }
 
 #id_name {

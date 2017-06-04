@@ -109,7 +109,24 @@ function initializeChart(groupsItemsArray) {
     timeline.on('rangechanged', UploadEventsAjax);
     timeline.on('rangechanged', UploadAndHideNestedEvents);
     timeline.on('rangechanged', HideItems);
+    timeline.on('select', LoadFullInfo);
 }
+function LoadFullInfo(properties) {
+    var eventId = properties.items[0];
+    var tabSelector = '#tab'+eventId;
+    if ($(tabSelector).length != 0){
+        $('a[href="'+ tabSelector +'"]').tab('show');
+        return;
+    }
+    $.ajax({
+        type: 'GET',
+        url: 'full_info/' + eventId
+    })
+        .done(function (data) {
+            return CreateTab(data);
+        });
+}
+
 function HideItems(environments) {
     hideSmallItems(environments.end, environments.start);
 }

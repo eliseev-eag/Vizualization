@@ -2,6 +2,8 @@ from datetime import datetime
 
 from django.db.models import ExpressionWrapper, fields, Count, Max, Min
 from django.db.models import F
+from django.db.models import Value
+from django.db.models.functions import Concat
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -91,3 +93,12 @@ def search(request):
     values = events.values('id', 'start_date', 'end_date', 'name', 'event_type', 'parent_event')
     return JsonResponse({'events': list(values), 'max_date': dates_boundary_values['end_date__max'],
                          'min_date': dates_boundary_values['start_date__min']})
+
+
+def get_full_info(request, event_id):
+    event = Event.objects.get(pk=event_id)
+    toponyms = event.toponyms.values_list('name')
+    persons = event.persons.annotate(
+        full_name=Concat(F('surname'), Value(' '), F('name'), Value(' '), F('patron'))).values_list('full_name')
+    return JsonResponse({'id': event.id, 'name': event.name, 'start_date': event.start_date, 'end_date': event.end_date,
+                         'event_type': event.event_type, 'toponyms': list(toponyms), 'persons': list(persons)})
