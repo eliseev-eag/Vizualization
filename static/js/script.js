@@ -34,6 +34,7 @@ $(document).ready(function () {
 
 var serializedSearchForm = null;
 function search(searchForm) {
+    $('#searchError').addClass('hidden');
 
     if (searchForm.serializeArray().every(function (element) {
             return element.value == ''
@@ -56,6 +57,11 @@ function search(searchForm) {
         data: serializedSearchForm,
     })
         .done(function (data) {
+            if (data.events.length == 0) {
+                $('#searchError').html('Ничего не найдено :(');
+                $('#searchError').removeClass('hidden');
+                return;
+            }
             timeline.off('rangechanged', HideItems);
             items.clear();
             var min_date = new Date(data['min_date']);
@@ -113,9 +119,9 @@ function initializeChart(groupsItemsArray) {
 }
 function LoadFullInfo(properties) {
     var eventId = properties.items[0];
-    var tabSelector = '#tab'+eventId;
-    if ($(tabSelector).length != 0){
-        $('a[href="'+ tabSelector +'"]').tab('show');
+    var tabSelector = '#tab' + eventId;
+    if ($(tabSelector).length != 0) {
+        $('a[href="' + tabSelector + '"]').tab('show');
         return;
     }
     $.ajax({
