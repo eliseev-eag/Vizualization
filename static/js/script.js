@@ -48,7 +48,8 @@ function search(searchForm) {
         return;
     }
 
-    serializedSearchForm = searchForm.serialize();
+    serializedSearchForm = searchForm.serializeArray();
+    serializedSearchForm.push({name: 'count', value: 100});
     $.ajax({
         type: searchForm.attr('method'),
         url: searchForm.attr('action'),
@@ -139,8 +140,10 @@ function UploadAndHideNestedEvents(environments) {
         if (!visibleItem || visibleItem.nested === null) return;
 
         if (visibleItem.duration < timeline_length * 0.15 && visibleItem.type == 'background') {
-            items.remove(visibleItem.nested);
-            visibleItem.nested = [];
+            if (serializedSearchForm == null) {
+                items.remove(visibleItem.nested);
+                visibleItem.nested = [];
+            }
             visibleItem.type = 'range';
             items.update(visibleItem);
             return;

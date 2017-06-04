@@ -26,8 +26,10 @@ def get_events(request, start_date, end_date):
     events = Event.objects.filter(end_date__gte=start_date,
                                   start_date__lte=end_date,
                                   parent_event__isnull=True)
-    events = events.annotate(duration=duration).filter(duration__gte=timeline_length)
-    events = search_filters(request, events)
+    if request.method != "POST":
+        events = events.annotate(duration=duration).filter(duration__gte=timeline_length)
+    else:
+        events = search_filters(request, events)
     values = events.values('id', 'start_date', 'end_date', 'name', 'event_type', 'parent_event')
     return JsonResponse({'events': list(values)})
 
@@ -45,9 +47,6 @@ def get_event_types(request):
 
 
 def search_filters(request, events):
-    if request.method != "POST":
-        return events
-
     form = EventSearchForm(request.POST)
     if not form.is_valid():
         return events
@@ -87,7 +86,8 @@ def search(request):
     events = Event.objects.all()
     events = search_filters(request, events)
     dates_boundary_values = events.aggregate(Max('end_date'), Min('start_date'))
-    events = events.order_by('start_date')[:100]
+    count = int(request.POST['count'])
+    events = events.order_by('start_date')[:count]
     values = events.values('id', 'start_date', 'end_date', 'name', 'event_type', 'parent_event')
     return JsonResponse({'events': list(values), 'max_date': dates_boundary_values['end_date__max'],
                          'min_date': dates_boundary_values['start_date__min']})
