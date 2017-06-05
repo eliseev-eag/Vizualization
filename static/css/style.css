@@ -7,6 +7,13 @@ body, html {
     border-radius: 4px
 }
 
+#visibleGroups {
+    margin: 10px 0;
+}
+
+#visibleGroups .dropdown-menu{
+    padding: 10px;
+}
 
 /* Общие стили для vis.js объектов */
 .vis-timeline {
@@ -40,6 +47,7 @@ body, html {
     color: lightgray;
 }*/
 
+/* Стили для tab-ов  */
 #info_tabs{
     margin-top: 20px;
     margin-bottom: 20px;
@@ -62,4 +70,8 @@ body, html {
     margin-left: 30px;
     margin-top: 20px;
     font-size: 14pt;
+}
+
+.closeTab{
+    margin-left: 10px;
 }

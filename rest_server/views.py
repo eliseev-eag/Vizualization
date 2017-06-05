@@ -14,7 +14,9 @@ from rest_server.models import Event
 
 def index(request):
     event_search_form = EventSearchForm()
-    return render(request, 'index.html', {'form': event_search_form})
+    event_types_tuples = Event.objects.values_list('event_type').distinct()
+    event_types = [type[0] for type in event_types_tuples]
+    return render(request, 'index.html', {'form': event_search_form, 'event_types': event_types})
 
 
 @csrf_exempt
@@ -44,7 +46,8 @@ def get_nested(request, parent_event_id):
 
 
 def get_event_types(request):
-    event_types = Event.objects.values_list('event_type').distinct()
+    event_types_tuples = Event.objects.values_list('event_type').distinct()
+    event_types = [type[0] for type in event_types_tuples]
     return JsonResponse(list(event_types), safe=False)
 
 

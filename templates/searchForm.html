@@ -58,6 +58,25 @@
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="btn-group" id="visibleGroups">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false">
+                Отображаемые типы <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                {% for event_type in event_types %}
+                    <li>
+                        <label class="checkbox-inline"><input type="checkbox" checked value="{{ event_type }}">
+                            {{ event_type }}
+                        </label>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </form>
 
 <div class="row">

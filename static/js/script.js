@@ -93,7 +93,14 @@ function init() {
                 groupItem.visible = true;
                 return groupItem;
             });
-            initializeChart(groupsItemsArray)
+            initializeChart(groupsItemsArray);
+
+            $(":checkbox").change(function () {
+                var groupId = $(this).val();
+                var group = groups.get(groupId);
+                group.visible = !group.visible;
+                groups.update(group);
+            });
         });
 }
 
