@@ -1,3 +1,4 @@
+'use strict';
 var items;
 var timeline;
 var groups;
@@ -11,6 +12,10 @@ var options = {
     minHeight: '400px',
     maxHeight: '400px',
     type: 'range',
+    tooltip: {
+        followMouse: true,
+        overflowMethod: 'cap'
+    },
     snap: null,
     orientation: {axis: 'both'},
     dataAttributes: ['id'],
@@ -112,13 +117,6 @@ function initializeChart(groupsItemsArray) {
     groups = new vis.DataSet(groupsItemsArray);
     timeline = new vis.Timeline(container, items, groups, options);
 
-
-    timeline.on('mouseOver', function (environments) {
-        FillFullnameForm(items.get(environments.item), environments.pageX, environments.pageY,
-            function () {
-                return environments.what != 'item';
-            });
-    });
     timeline.on('rangechanged', UploadEventsAjax);
     timeline.on('rangechanged', UploadAndHideNestedEvents);
     timeline.on('rangechanged', HideItems);
@@ -293,6 +291,19 @@ function convertToDistObject(items) {
         var groupItem = groups.get(item.group);
         if (groupItem)
             item.className = groupItem.class;
+        item.title =
+            `
+    <h3 class="eventname">${item.name}</h3>
+    <hr>
+    <div class="dates">
+        <div> ${convertDateToRusStandart(item.start_date)} - ${convertDateToRusStandart(item.end_date)}</div>
+        <div><b>Продолжительность: </b>${Math.floor(item.duration / (1000 * 60 * 60 * 24))} дн.</div>
+    </div>`;
     });
     return items;
+}
+
+function convertDateToRusStandart(date) {
+    var splittedDate = date.split('-');
+    return splittedDate[2] + '.' + splittedDate[1] + '.' + splittedDate[0];
 }

@@ -1,7 +1,6 @@
 body, html {
     font-family: "Helvetica", "Arial", sans-serif;
     font-size: 11pt;
-   /* background-color: #f0f0f0;*/
 }
 #fullname, .div-range, .btn {
     border-radius: 4px
@@ -40,6 +39,44 @@ body, html {
     text-shadow: 1px 1px 2px gray;
     z-index: 50;
 }
+
+/* Всплывашка с аннотацией */
+div.vis-tooltip{
+    background-color: white;
+    border: solid 1px #bdbdbd;
+    width: 300px;
+    font-size: 12px;
+    z-index: 50;
+    box-shadow: 0 0 5px gray;
+    white-space: normal;
+}
+
+.eventname {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.dates {
+    height: 80px;
+    margin-left: 10px;
+}
+
+.dates div {
+    margin: auto;
+    padding: 0.5em 0.5em 0 0;
+    text-align: left;
+    font-size: 14px;
+}
+
+hr {
+    padding: 0;
+    margin: 10px;
+    color: #bdbdbd;
+    opacity: 0.3;
+}
+
 /*
 .vis-background{
     font-size: 14pt;
