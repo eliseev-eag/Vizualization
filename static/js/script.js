@@ -1,13 +1,12 @@
-'use strict';
-var items;
-var timeline;
-var groups;
+let items;
+let timeline;
+let groups;
 
-var defaultMaxDate = new Date();
+const defaultMaxDate = new Date();
 defaultMaxDate.setFullYear(defaultMaxDate.getFullYear() + 5);
 
 const defaultMinDate = new Date(100, 0, 0);
-var options = {
+const options = {
     align: 'center',
     minHeight: '400px',
     maxHeight: '400px',
@@ -28,7 +27,7 @@ $(document).ready(function () {
     $('#start_date').datetimepicker({locale: 'ru', format: 'L'});
     $('#end_date').datetimepicker({locale: 'ru', format: 'L'});
 
-    var searchForm = $('#search');
+    const searchForm = $('#search');
     searchForm.submit(function () {
         search(searchForm);
         return false;
@@ -37,12 +36,12 @@ $(document).ready(function () {
     init();
 });
 
-var serializedSearchForm = null;
+let serializedSearchForm = null;
 function search(searchForm) {
     $('#searchError').addClass('hidden');
 
     if (searchForm.serializeArray().every(function (element) {
-            return element.value == ''
+            return element.value === ''
         })) {
         serializedSearchForm = null;
         items.clear();
@@ -62,36 +61,37 @@ function search(searchForm) {
         data: serializedSearchForm,
     })
         .done(function (data) {
-            if (data.events.length == 0) {
+            if (data.events.length === 0) {
                 $('#searchError').html('Ничего не найдено :(');
                 $('#searchError').removeClass('hidden');
                 return;
             }
             timeline.off('rangechanged', HideItems);
             items.clear();
-            var min_date = new Date(data['min_date']);
+            const min_date = new Date(data['min_date']);
             min_date.setFullYear(min_date.getFullYear() - 5);
-            var max_date = new Date(data['max_date']);
+            const max_date = new Date(data['max_date']);
             max_date.setFullYear(max_date.getFullYear() + 5);
             options.min = min_date;
             options.max = max_date;
             timeline.setOptions(options);
-            var result = convertToDistObject(data['events']);
+            const result = convertToDistObject(data['events']);
             timeline.moveTo(data['min_date']);
             items.update(result);
-        });
+        })
+        .fail(data => console.log(data));
 }
 
 function init() {
-    var classes = ['blue', 'red', 'purple', 'yellow', 'green'];
+    const classes = ['blue', 'red', 'purple', 'yellow', 'green'];
 
     $.ajax({
         type: 'GET',
         url: 'event_types',
     })
         .done(function (eventTypes) {
-            var groupsItemsArray = eventTypes.map(function (eventTypesItem) {
-                var groupItem = {};
+            const groupsItemsArray = eventTypes.map(function (eventTypesItem) {
+                const groupItem = {};
                 groupItem.id = eventTypesItem;
                 groupItem.content = eventTypesItem;
                 groupItem.class = classes[Math.floor(Math.random() * classes.length)];
@@ -101,8 +101,8 @@ function init() {
             initializeChart(groupsItemsArray);
 
             $(":checkbox").change(function () {
-                var groupId = $(this).val();
-                var group = groups.get(groupId);
+                const groupId = $(this).val();
+                const group = groups.get(groupId);
                 group.visible = !group.visible;
                 groups.update(group);
             });
@@ -110,7 +110,7 @@ function init() {
 }
 
 function initializeChart(groupsItemsArray) {
-    var container = document.getElementById('graph');
+    const container = document.getElementById('graph');
 
 
     items = new vis.DataSet();
@@ -123,9 +123,9 @@ function initializeChart(groupsItemsArray) {
     timeline.on('select', LoadFullInfo);
 }
 function LoadFullInfo(properties) {
-    var eventId = properties.items[0];
-    var tabSelector = '#tab' + eventId;
-    if ($(tabSelector).length != 0) {
+    const eventId = properties.items[0];
+    const tabSelector = '#tab' + eventId;
+    if ($(tabSelector).length !== 0) {
         $('a[href="' + tabSelector + '"]').tab('show');
         return;
     }
@@ -135,40 +135,41 @@ function LoadFullInfo(properties) {
     })
         .done(function (data) {
             return CreateTab(data);
-        });
+        })
+        .fail(data => console.log(data));
 }
 
 function HideItems(environments) {
     hideSmallItems(environments.end, environments.start);
 }
 function hideSmallItems(end, start) {
-    var visibleItemsIndexes = timeline.getVisibleItems();
+    const visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
-        var visibleItem = items.get(visibleItemIndex);
-        var timeline_length = end - start;
+        const visibleItem = items.get(visibleItemIndex);
+        const timeline_length = end - start;
         if (visibleItem.duration < timeline_length * 0.008) {
-            var t = items.remove(visibleItem);
+            const t = items.remove(visibleItem);
         }
     });
 }
 
-var isUploadingNestedNow = false;
-var nested_env;
+let isUploadingNestedNow = false;
+let nested_env;
 function UploadAndHideNestedEvents(environments) {
     nested_env = environments;
     if (isUploadingNestedNow) {
         return;
     }
 
-    var visibleItemsIndexes = timeline.getVisibleItems();
+    const visibleItemsIndexes = timeline.getVisibleItems();
     visibleItemsIndexes.forEach(function (visibleItemIndex) {
-        var visibleItem = items.get(visibleItemIndex);
-        var timeline_length = environments.end - environments.start;
+        let visibleItem = items.get(visibleItemIndex);
+        const timeline_length = environments.end - environments.start;
 
         if (!visibleItem || visibleItem.nested === null) return;
 
-        if (visibleItem.duration < timeline_length * 0.15 && visibleItem.type == 'background') {
-            if (serializedSearchForm == null) {
+        if (visibleItem.duration < timeline_length * 0.15 && visibleItem.type === 'background') {
+            if (serializedSearchForm === null) {
                 items.remove(visibleItem.nested);
                 visibleItem.nested = [];
             }
@@ -177,8 +178,8 @@ function UploadAndHideNestedEvents(environments) {
             return;
         }
 
-        if ((visibleItem.nested == undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.2) {
-            var saved_environments = environments;
+        if ((visibleItem.nested === undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.2) {
+            const saved_environments = environments;
             isUploadingNestedNow = true;
             uploadNestedEventsAjax(visibleItem.id)
                 .then(function (rows) {
@@ -194,19 +195,20 @@ function UploadAndHideNestedEvents(environments) {
                     }
                     items.update(visibleItem);
                     isUploadingNestedNow = false;
-                });
+                })
+                .catch(data => console.log(data));
 
             setTimeout(function () {
-                if (saved_environments != nested_env)
+                if (saved_environments !== nested_env)
                     UploadAndHideNestedEvents(nested_env);
             }, 800);
         }
     });
 }
 
-var isUploadingEventsNow = false;
-var env;
-var saved_env;
+let isUploadingEventsNow = false;
+let env;
+let saved_env;
 
 function UploadEventsAjax(environments) {
     env = environments;
@@ -216,26 +218,27 @@ function UploadEventsAjax(environments) {
 
     isUploadingEventsNow = true;
     saved_env = environments;
-    var timelineLength = saved_env.end - saved_env.start;
-    var dateTime = extractTimelineLenght(timelineLength);
-    var offsetEndDate = dateTime.offsetEndDate;
-    var offsetStartDate = dateTime.offsetStartDate;
+    const timelineLength = saved_env.end - saved_env.start;
+    const dateTime = extractTimelineLenght(timelineLength);
+    const offsetEndDate = dateTime.offsetEndDate;
+    const offsetStartDate = dateTime.offsetStartDate;
 
     uploadEventsAjax(offsetStartDate.toISOString().slice(0, 10), offsetEndDate.toISOString().slice(0, 10))
         .then(function (rows) {
             items.update(rows);
             isUploadingEventsNow = false;
-        });
+        })
+        .catch(data => console.log(data));
 
 }
 
 
 function uploadEventsAjax(start_date, end_date) {
     return new Promise(function (resolve, reject) {
-        var requestType = 'GET';
-        var requestData = null;
+        let requestType = 'GET';
+        let requestData = null;
 
-        if (serializedSearchForm != null) {
+        if (serializedSearchForm !== null) {
             requestType = 'POST';
             requestData = serializedSearchForm;
         }
@@ -246,7 +249,7 @@ function uploadEventsAjax(start_date, end_date) {
             data: requestData
         })
             .done(function (data) {
-                var result = convertToDistObject(data['events']);
+                const result = convertToDistObject(data['events']);
                 resolve(result);
             })
             .fail(function (data) {
@@ -257,12 +260,12 @@ function uploadEventsAjax(start_date, end_date) {
 
 function uploadNestedEventsAjax(parent_event_id) {
     return new Promise(function (resolve, reject) {
-        $.ajax({
+            $.ajax({
             type: 'GET',
             url: 'nested_events/' + parent_event_id,
         })
             .done(function (data) {
-                var result = convertToDistObject(data['events'])
+                let result = convertToDistObject(data['events'])
                 resolve(result);
             })
             .fail(function (data) {
@@ -272,8 +275,8 @@ function uploadNestedEventsAjax(parent_event_id) {
 }
 
 function extractTimelineLenght(timelineLength) {
-    var offsetEndDate = new Date(saved_env.end.getTime() + timelineLength * 0.2);
-    var offsetStartDate = new Date(saved_env.start.getTime() - timelineLength * 0.2);
+    let offsetEndDate = new Date(saved_env.end.getTime() + timelineLength * 0.2);
+    let offsetStartDate = new Date(saved_env.start.getTime() - timelineLength * 0.2);
     if (offsetStartDate < options.min)
         offsetStartDate = options.min;
     if (offsetEndDate > options.max)
@@ -288,7 +291,7 @@ function convertToDistObject(items) {
         item.end = item.end_date;
         item.duration = (new Date(item.end_date) - new Date(item.start_date));
         item.group = item.event_type;
-        var groupItem = groups.get(item.group);
+        const groupItem = groups.get(item.group);
         if (groupItem)
             item.className = groupItem.class;
         item.title =
@@ -304,6 +307,6 @@ function convertToDistObject(items) {
 }
 
 function convertDateToRusStandart(date) {
-    var splittedDate = date.split('-');
+    const splittedDate = date.split('-');
     return splittedDate[2] + '.' + splittedDate[1] + '.' + splittedDate[0];
 }
