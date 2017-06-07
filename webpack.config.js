@@ -7,10 +7,6 @@ const webpack = require('webpack');
 
 const config = {
     entry: './static/js/script.js',
-    output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'bundle.js'
-    },
     plugins: [
         new webpack.ProvidePlugin({
             $: 'jquery',
@@ -24,7 +20,11 @@ const config = {
             {test: /\.(js|jsx)$/, use: 'babel-loader'}
         ]
     },
-    devtool: 'cheap-eval-source-map'
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'bundle.js'
+    },
+    devtool: 'source-map'
 };
 
 module.exports = config;
