@@ -1,8 +1,4 @@
-{% load static %}
-
-<link rel="stylesheet" href="{% static 'css/bootstrap-datetimepicker.css' %}">
-<link rel="stylesheet" href="{% static 'css/search.css' %}">
-<form id="search" method="POST" action="{% url 'search' %}" class="post-form form-inline">
+<form id="search" method="POST" action="{% url 'search-url' %}" class="post-form form-inline">
     <div class="row">
         {{ form.name }}
         <button id="find_btn" type="submit" class="save btn btn-success">Найти</button>

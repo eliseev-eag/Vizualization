@@ -4,17 +4,16 @@
 import $ from 'jquery';
 import {convertDateToRusStandart} from './script';
 
-//export function init() {
-    $(document).ready(function () {
-        $('#info_tabs').on('click', '.closeTab', function () {
-            const tabContentId = $(this).parent().attr('href');
-            $(this).parent().parent().remove(); //remove li of tab
-            $(tabContentId).remove(); //remove respective tab content
+export function InitTabs() {
+    $('#info_tabs').on('click', '.closeTab', function () {
+        const tabContentId = $(this).parent().attr('href');
+        $(this).parent().parent().remove(); //remove li of tab
+        $(tabContentId).remove(); //remove respective tab content
 
-            $('#tabs a:last').tab('show');
-        });
+        $('#tabs a:last').tab('show');
     });
-//}
+
+}
 
 export function CreateTab(eventInfo) {
 

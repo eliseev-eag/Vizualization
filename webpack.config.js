@@ -7,7 +7,8 @@ const webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const config = {
-    entry: './static/js/script.js',
+    context: path.resolve(__dirname, 'static'),
+    entry: './js/script.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js'
@@ -28,8 +29,8 @@ const config = {
             {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({
-                    fallbackLoader: 'style-loader',
-                    loader: ['css-loader'],
+                    fallback: 'style-loader',
+                    use: ['css-loader'],
                     publicPath: '/dist'
                 })
             }

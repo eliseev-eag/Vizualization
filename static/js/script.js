@@ -1,11 +1,14 @@
 import $ from 'jquery';
 import {tab} from 'bootstrap';
 
-import vis from 'vis';
-import {CreateTab} from './infoTabs';
-import {datetimepicker} from 'eonasdan-bootstrap-datetimepicker';
-const css = require('../css/style.css');
-const classItems = require('../css/classItems.css');
+import * as vis from 'vis/dist/vis-timeline-graph2d.min';
+import 'vis/dist/vis-timeline-graph2d.min.css';
+
+import {CreateTab,InitTabs} from './infoTabs';
+import * as searchForm from './search';
+
+import '../css/style.css';
+import '../css/classItems.css';
 
 export {convertDateToRusStandart};
 
@@ -34,64 +37,35 @@ const options = {
     min: defaultMinDate
 };
 
-$(document).ready(function () {
-    $('#start_date').datetimepicker({locale: 'ru', format: 'L'});
-    $('#end_date').datetimepicker({locale: 'ru', format: 'L'});
-
-    const searchForm = $('#search');
-    searchForm.submit(function () {
-        search(searchForm);
-        return false;
-    });
-    //init();
-    initGroups();
-});
-
-let serializedSearchForm = null;
-function search(searchForm) {
-    $('#searchError').addClass('hidden');
-
-    if (searchForm.serializeArray().every(function (element) {
-        return element.value === '';
-    })) {
-        serializedSearchForm = null;
+$(document).ready(() => {
+    let searchFailedCallback = (data) => {
         items.clear();
         options.min = defaultMinDate;
         options.max = defaultMaxDate;
         timeline.setOptions(options);
         timeline.moveTo(Date.now());
         timeline.on('rangechanged', HideItems);
-        return;
-    }
+    };
 
-    serializedSearchForm = searchForm.serializeArray();
-    serializedSearchForm.push({name: 'count', value: 100});
-    $.ajax({
-        type: searchForm.attr('method'),
-        url: searchForm.attr('action'),
-        data: serializedSearchForm,
-    })
-        .done(function (data) {
-            if (data.events.length === 0) {
-                $('#searchError').html('Ничего не найдено :(');
-                $('#searchError').removeClass('hidden');
-                return;
-            }
-            timeline.off('rangechanged', HideItems);
-            items.clear();
-            const min_date = new Date(data['min_date']);
-            min_date.setFullYear(min_date.getFullYear() - 5);
-            const max_date = new Date(data['max_date']);
-            max_date.setFullYear(max_date.getFullYear() + 5);
-            options.min = min_date;
-            options.max = max_date;
-            timeline.setOptions(options);
-            const result = convertToDistObject(data['events']);
-            timeline.moveTo(data['min_date']);
-            items.update(result);
-        })
-        .fail(data => console.log(data));
-}
+    let searchSuccessCallback = (data) => {
+        timeline.off('rangechanged', HideItems);
+        items.clear();
+        const min_date = new Date(data['min_date']);
+        min_date.setFullYear(min_date.getFullYear() - 5);
+        const max_date = new Date(data['max_date']);
+        max_date.setFullYear(max_date.getFullYear() + 5);
+        options.min = min_date;
+        options.max = max_date;
+        timeline.setOptions(options);
+        const result = convertToDistObject(data['events']);
+        timeline.moveTo(data['min_date']);
+        items.update(result);
+    };
+
+    searchForm.InitSearchForm(searchSuccessCallback, searchFailedCallback);
+    InitTabs();
+    initGroups();
+});
 
 function initGroups() {
     const classes = ['blue', 'red', 'purple', 'yellow', 'green'];
@@ -117,7 +91,8 @@ function initGroups() {
                 group.visible = !group.visible;
                 groups.update(group);
             });
-        });
+        })
+        .fail(data => console.log(data));
 }
 
 function initializeChart(groupsItemsArray) {
@@ -179,7 +154,7 @@ function UploadAndHideNestedEvents(environments) {
         if (!visibleItem || visibleItem.nested === null) return;
 
         if (visibleItem.duration < timeline_length * 0.15 && visibleItem.type === 'background') {
-            if (serializedSearchForm === null) {
+            if (searchForm.serializedSearchForm === null) {
                 items.remove(visibleItem.nested);
                 visibleItem.nested = [];
             }
@@ -245,9 +220,9 @@ function uploadEventsAjax(start_date, end_date) {
         let requestType = 'GET';
         let requestData = null;
 
-        if (serializedSearchForm !== null) {
+        if (searchForm.serializedSearchForm !== null) {
             requestType = 'POST';
-            requestData = serializedSearchForm;
+            requestData = searchForm.serializedSearchForm;
         }
 
         $.ajax({
