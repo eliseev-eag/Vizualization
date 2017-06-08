@@ -1,3 +1,14 @@
+import * as vis from 'vis';
+import 'vis/dist/vis-timeline-graph2d.min.css';
+
+import * as tabs from './infoTabs';
+import * as searchForm from './search';
+import * as converter from './converter';
+import * as requester from './requester';
+
+import '../css/style.css';
+import '../css/classItems.css';
+
 let items;
 let timeline;
 let groups;
@@ -23,74 +34,42 @@ const options = {
     min: defaultMinDate
 };
 
-$(document).ready(function () {
-    $('#start_date').datetimepicker({locale: 'ru', format: 'L'});
-    $('#end_date').datetimepicker({locale: 'ru', format: 'L'});
-
-    const searchForm = $('#search');
-    searchForm.submit(function () {
-        search(searchForm);
-        return false;
-    });
-
-    init();
-});
-
-let serializedSearchForm = null;
-function search(searchForm) {
-    $('#searchError').addClass('hidden');
-
-    if (searchForm.serializeArray().every(function (element) {
-            return element.value === ''
-        })) {
-        serializedSearchForm = null;
+window.onload = ()=>{
+    let searchResetCallback = (data) => {
         items.clear();
         options.min = defaultMinDate;
         options.max = defaultMaxDate;
         timeline.setOptions(options);
         timeline.moveTo(Date.now());
         timeline.on('rangechanged', HideItems);
-        return;
-    }
+    };
 
-    serializedSearchForm = searchForm.serializeArray();
-    serializedSearchForm.push({name: 'count', value: 100});
-    $.ajax({
-        type: searchForm.attr('method'),
-        url: searchForm.attr('action'),
-        data: serializedSearchForm,
-    })
-        .done(function (data) {
-            if (data.events.length === 0) {
-                $('#searchError').html('Ничего не найдено :(');
-                $('#searchError').removeClass('hidden');
-                return;
-            }
-            timeline.off('rangechanged', HideItems);
-            items.clear();
-            const min_date = new Date(data['min_date']);
-            min_date.setFullYear(min_date.getFullYear() - 5);
-            const max_date = new Date(data['max_date']);
-            max_date.setFullYear(max_date.getFullYear() + 5);
-            options.min = min_date;
-            options.max = max_date;
-            timeline.setOptions(options);
-            const result = convertToDistObject(data['events']);
-            timeline.moveTo(data['min_date']);
-            items.update(result);
-        })
-        .fail(data => console.log(data));
-}
+    let searchActivateCallback = (data) => {
+        timeline.off('rangechanged', HideItems);
+        items.clear();
+        const min_date = new Date(data['min_date']);
+        min_date.setFullYear(min_date.getFullYear() - 5);
+        const max_date = new Date(data['max_date']);
+        max_date.setFullYear(max_date.getFullYear() + 5);
+        options.min = min_date;
+        options.max = max_date;
+        timeline.setOptions(options);
+        const result = converter.convertBackendObjectsToFrontendObjects(data['events'],groups);
+        timeline.moveTo(data['min_date']);
+        items.update(result);
+    };
 
-function init() {
+    searchForm.InitSearchForm(searchActivateCallback, searchResetCallback);
+    tabs.InitTabs();
+    initGroups();
+};
+
+function initGroups() {
     const classes = ['blue', 'red', 'purple', 'yellow', 'green'];
 
-    $.ajax({
-        type: 'GET',
-        url: 'event_types',
-    })
-        .done(function (eventTypes) {
-            const groupsItemsArray = eventTypes.map(function (eventTypesItem) {
+    requester.GetEventTypes()
+        .then(eventTypes => {
+            const groupsItemsArray = eventTypes.map( eventTypesItem =>{
                 const groupItem = {};
                 groupItem.id = eventTypesItem;
                 groupItem.content = eventTypesItem;
@@ -99,19 +78,13 @@ function init() {
                 return groupItem;
             });
             initializeChart(groupsItemsArray);
-
-            $(":checkbox").change(function () {
-                const groupId = $(this).val();
-                const group = groups.get(groupId);
-                group.visible = !group.visible;
-                groups.update(group);
-            });
-        });
+            searchForm.InitGroupsHide(groups);
+        })
+        .catch(data => console.log(data));
 }
 
 function initializeChart(groupsItemsArray) {
     const container = document.getElementById('graph');
-
 
     items = new vis.DataSet();
     groups = new vis.DataSet(groupsItemsArray);
@@ -122,21 +95,14 @@ function initializeChart(groupsItemsArray) {
     timeline.on('rangechanged', HideItems);
     timeline.on('select', LoadFullInfo);
 }
+
 function LoadFullInfo(properties) {
     const eventId = properties.items[0];
-    const tabSelector = '#tab' + eventId;
-    if ($(tabSelector).length !== 0) {
-        $('a[href="' + tabSelector + '"]').tab('show');
+    if (tabs.ActivateTabIfExists(eventId))
         return;
-    }
-    $.ajax({
-        type: 'GET',
-        url: 'full_info/' + eventId
-    })
-        .done(function (data) {
-            return CreateTab(data);
-        })
-        .fail(data => console.log(data));
+    requester.GetFullInfo(eventId)
+        .then(data => tabs.CreateTab(data))
+        .catch(data => console.log(data));
 }
 
 function HideItems(environments) {
@@ -144,11 +110,11 @@ function HideItems(environments) {
 }
 function hideSmallItems(end, start) {
     const visibleItemsIndexes = timeline.getVisibleItems();
-    visibleItemsIndexes.forEach(function (visibleItemIndex) {
+    visibleItemsIndexes.forEach(visibleItemIndex => {
         const visibleItem = items.get(visibleItemIndex);
         const timeline_length = end - start;
         if (visibleItem.duration < timeline_length * 0.008) {
-            const t = items.remove(visibleItem);
+            items.remove(visibleItem);
         }
     });
 }
@@ -162,14 +128,14 @@ function UploadAndHideNestedEvents(environments) {
     }
 
     const visibleItemsIndexes = timeline.getVisibleItems();
-    visibleItemsIndexes.forEach(function (visibleItemIndex) {
+    visibleItemsIndexes.forEach(visibleItemIndex => {
         let visibleItem = items.get(visibleItemIndex);
         const timeline_length = environments.end - environments.start;
 
         if (!visibleItem || visibleItem.nested === null) return;
 
         if (visibleItem.duration < timeline_length * 0.15 && visibleItem.type === 'background') {
-            if (serializedSearchForm === null) {
+            if (searchForm.serializedSearchForm === null) {
                 items.remove(visibleItem.nested);
                 visibleItem.nested = [];
             }
@@ -181,14 +147,13 @@ function UploadAndHideNestedEvents(environments) {
         if ((visibleItem.nested === undefined || !visibleItem.nested.length) && visibleItem.duration > timeline_length * 0.2) {
             const saved_environments = environments;
             isUploadingNestedNow = true;
-            uploadNestedEventsAjax(visibleItem.id)
-                .then(function (rows) {
-                    if (rows.length > 0) {
-                        visibleItem.nested = rows.map(function (rowsItem) {
-                            return rowsItem.id;
-                        });
+            requester.UploadNestedEvents(visibleItem.id)
+                .then(data => {
+                    let nestedEvents = converter.convertBackendObjectsToFrontendObjects(data['events'],groups);
+                    if (nestedEvents.length > 0) {
+                        visibleItem.nested = nestedEvents.map(nestedEvent => nestedEvent.id );
                         visibleItem.type = 'background';
-                        items.update(rows);
+                        items.update(nestedEvents);
                     }
                     else {
                         visibleItem.nested = null;
@@ -198,7 +163,7 @@ function UploadAndHideNestedEvents(environments) {
                 })
                 .catch(data => console.log(data));
 
-            setTimeout(function () {
+            setTimeout(() => {
                 if (saved_environments !== nested_env)
                     UploadAndHideNestedEvents(nested_env);
             }, 800);
@@ -207,71 +172,27 @@ function UploadAndHideNestedEvents(environments) {
 }
 
 let isUploadingEventsNow = false;
-let env;
 let saved_env;
 
 function UploadEventsAjax(environments) {
-    env = environments;
+    saved_env = environments;
     if (isUploadingEventsNow) {
         return;
     }
 
     isUploadingEventsNow = true;
-    saved_env = environments;
     const timelineLength = saved_env.end - saved_env.start;
     const dateTime = extractTimelineLenght(timelineLength);
     const offsetEndDate = dateTime.offsetEndDate;
     const offsetStartDate = dateTime.offsetStartDate;
 
-    uploadEventsAjax(offsetStartDate.toISOString().slice(0, 10), offsetEndDate.toISOString().slice(0, 10))
-        .then(function (rows) {
-            items.update(rows);
+    requester.UploadEvents(offsetStartDate.toISOString().slice(0, 10), offsetEndDate.toISOString().slice(0, 10),searchForm)
+        .then(data => {
+            const uploadedItems = converter.convertBackendObjectsToFrontendObjects(data['events'],groups);
+            items.update(uploadedItems);
             isUploadingEventsNow = false;
         })
         .catch(data => console.log(data));
-
-}
-
-
-function uploadEventsAjax(start_date, end_date) {
-    return new Promise(function (resolve, reject) {
-        let requestType = 'GET';
-        let requestData = null;
-
-        if (serializedSearchForm !== null) {
-            requestType = 'POST';
-            requestData = serializedSearchForm;
-        }
-
-        $.ajax({
-            type: requestType,
-            url: 'events/' + start_date + '/' + end_date + '/',
-            data: requestData
-        })
-            .done(function (data) {
-                const result = convertToDistObject(data['events']);
-                resolve(result);
-            })
-            .fail(function (data) {
-                reject(data);
-            })
-    })
-}
-
-function uploadNestedEventsAjax(parent_event_id) {
-    return new Promise(function (resolve, reject) {
-            $.ajax({
-            type: 'GET',
-            url: 'nested_events/' + parent_event_id,
-        })
-            .done(function (data) {
-                let result = convertToDistObject(data['events'])
-                resolve(result);
-            })
-            .fail(function (data) {
-                reject(data);
-            })
-    })
 }
 
 function extractTimelineLenght(timelineLength) {
@@ -282,31 +203,4 @@ function extractTimelineLenght(timelineLength) {
     if (offsetEndDate > options.max)
         offsetEndDate = options.max;
     return {offsetEndDate: offsetEndDate, offsetStartDate: offsetStartDate};
-}
-
-function convertToDistObject(items) {
-    items.forEach(function (item) {
-        item.content = item.name;
-        item.start = item.start_date;
-        item.end = item.end_date;
-        item.duration = (new Date(item.end_date) - new Date(item.start_date));
-        item.group = item.event_type;
-        const groupItem = groups.get(item.group);
-        if (groupItem)
-            item.className = groupItem.class;
-        item.title =
-            `
-    <h3 class="eventname">${item.name}</h3>
-    <hr>
-    <div class="dates">
-        <div> ${convertDateToRusStandart(item.start_date)} - ${convertDateToRusStandart(item.end_date)}</div>
-        <div><b>Продолжительность: </b>${Math.floor(item.duration / (1000 * 60 * 60 * 24))} дн.</div>
-    </div>`;
-    });
-    return items;
-}
-
-function convertDateToRusStandart(date) {
-    const splittedDate = date.split('-');
-    return splittedDate[2] + '.' + splittedDate[1] + '.' + splittedDate[0];
 }

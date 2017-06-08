@@ -7,5 +7,5 @@ urlpatterns = [
     url(r'^nested_events/(?P<parent_event_id>[0-9]+)', views.get_nested),
     url(r'^full_info/(?P<event_id>[0-9]+)', views.get_full_info),
     url(r'^event_types', views.get_event_types),
-    url(r'^search', views.search, name='search')
+    url(r'^search', views.search, name='search-url')
 ]
