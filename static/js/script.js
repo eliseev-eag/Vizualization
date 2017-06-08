@@ -4,6 +4,8 @@ import {tab} from 'bootstrap';
 import vis from 'vis';
 import {CreateTab} from './infoTabs';
 import {datetimepicker} from 'eonasdan-bootstrap-datetimepicker';
+const css = require('../css/style.css');
+const classItems = require('../css/classItems.css');
 
 export {convertDateToRusStandart};
 
