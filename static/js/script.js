@@ -2,7 +2,7 @@ import $ from 'jquery';
 import {tab} from 'bootstrap';
 
 import vis from 'vis';
-import {init,CreateTab} from './infoTabs';
+import {CreateTab} from './infoTabs';
 import {datetimepicker} from 'eonasdan-bootstrap-datetimepicker';
 
 export {convertDateToRusStandart};
@@ -41,7 +41,7 @@ $(document).ready(function () {
         search(searchForm);
         return false;
     });
-    init();
+    //init();
     initGroups();
 });
 

@@ -43,10 +43,4 @@ class RelationshipOfEvents(models.Model):
     id = models.AutoField(primary_key=True)
     parent_event = models.ForeignKey(Event)
     child_event = models.ForeignKey(Event, related_name='child_event')
-    REASON = 'reason'
-    RESULT = 'result'
-    RELATIONSHIP_DIRECTION_CHOICES = (
-        (REASON, 'reason'),
-        (RESULT, 'result')
-    )
-    relationship_direction = models.CharField(max_length=6, choices=RELATIONSHIP_DIRECTION_CHOICES)
+    relationship_direction = models.CharField(max_length=100)

@@ -15,6 +15,11 @@ const config = {
             jQuery: 'jquery'
         })
     ],
+    watch: true,
+    watchOptions: {
+        aggregateTimeout: 300,
+        poll: 1000
+    },
     module: {
         rules: [
             {
@@ -31,7 +36,7 @@ const config = {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js'
     },
-    devtool: 'source-map'
+    devtool: 'cheap-eval-source-map',
 };
 
 module.exports = config;
