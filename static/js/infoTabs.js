@@ -2,7 +2,9 @@
  * Created by happy on 02.06.2017.
  */
 import $ from 'jquery';
-import {convertDateToRusStandart} from './script';
+import {tab} from 'bootstrap';
+
+import {convertDateToRusStandart} from './converter';
 
 export function InitTabs() {
     $('#info_tabs').on('click', '.closeTab', function () {
@@ -38,4 +40,13 @@ export function CreateTab(eventInfo) {
     $(content).appendTo('.tab-content');
 
     $('#tabs a:last').tab('show');
+}
+
+export function ActivateTabIfExists(eventId) {
+    const tabSelector = '#tab' + eventId;
+    if ($(tabSelector).length !== 0) {
+        $('a[href="' + tabSelector + '"]').tab('show');
+        return true;
+    }
+    return false;
 }

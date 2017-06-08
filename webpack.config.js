@@ -47,7 +47,7 @@ const config = {
             filename: 'bundle.css',
             disable: false,
             allChunks: true
-        })
+        }),
     ],
     devtool: 'source-map',
     /*watch: true,

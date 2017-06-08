@@ -4,7 +4,7 @@
 
 import $ from 'jquery';
 import {InitDateTimePickers} from './dateTimePickers';
-
+import * as requester from './requester';
 import '../css/search.css';
 
 export function InitSearchForm(searchSuccess, searchFailed) {
@@ -16,34 +16,39 @@ export function InitSearchForm(searchSuccess, searchFailed) {
     InitDateTimePickers();
 }
 
+export function InitGroupsHide(groups) {
+    $(':checkbox').change(function(){
+        const groupId = $(this).val();
+        const group = groups.get(groupId);
+        group.visible = !group.visible;
+        groups.update(group);
+    });
+}
+
 export let serializedSearchForm = null;
 
-function search(searchForm, searchSuccess, searchFailed) {
+function search(searchForm, searchActivate, searchReset) {
     $('#searchError').addClass('hidden');
 
     if (searchForm.serializeArray().every(function (element) {
         return element.value === '';
     })) {
         serializedSearchForm = null;
-        searchFailed();
+        searchReset();
         return;
     }
 
     serializedSearchForm = searchForm.serializeArray();
     serializedSearchForm.push({name: 'count', value: 100});
-    $.ajax({
-        type: searchForm.attr('method'),
-        url: searchForm.attr('action'),
-        data: serializedSearchForm,
-    })
-        .done(function (data) {
+    requester.SearchFirstItems(searchForm,serializedSearchForm)
+        .then(function (data) {
             if (data.events.length === 0) {
                 $('#searchError').html('Ничего не найдено :(');
                 $('#searchError').removeClass('hidden');
                 return;
             }
-            searchSuccess(data);
+            searchActivate(data);
         })
-        .fail(data => console.log(data));
+        .catch(data => console.log(data));
     return false;
 }
