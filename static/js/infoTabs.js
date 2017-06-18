@@ -20,7 +20,7 @@ export function InitTabs() {
 export function CreateTab(eventInfo) {
 
     $('<li><a href="#tab' + eventInfo.id + '" data-toggle="tab">' + eventInfo.name + '<button class="close closeTab" type="button">×</button></a></li>').appendTo('#tabs');
-    const duration = Math.floor((new Date(eventInfo.end_date) - new Date(eventInfo.start_date)) / (1000 * 60 * 60 * 24));
+    const duration = Math.floor((new Date(eventInfo.end_date) - new Date(eventInfo.start_date)) / (1000 * 60 * 60 * 24)) + 1;
 
     let content = `<div class="tab-pane" id="tab${eventInfo.id}">
         <h4> ${eventInfo.name}</h4>

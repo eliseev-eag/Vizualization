@@ -18,7 +18,7 @@ export function convertBackendObjectsToFrontendObjects(items, groups) {
     <hr>
     <div class="dates">
         <div> ${convertDateToRusStandart(item.start_date)} - ${convertDateToRusStandart(item.end_date)}</div>
-        <div><b>Продолжительность: </b>${Math.floor(item.duration / (1000 * 60 * 60 * 24))} дн.</div>
+        <div><b>Продолжительность: </b>${Math.floor(item.duration / (1000 * 60 * 60 * 24)) + 1} дн.</div>
     </div>`;
     });
     return items;
