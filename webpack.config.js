@@ -22,7 +22,8 @@ const config = {
                     loader: 'babel-loader',
                     options: {
                         presets: ['env'],
-                        compact: true
+                        compact: true,
+                        cacheDirectory: true
                     }
                 }
             },

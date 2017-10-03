@@ -30,11 +30,11 @@ export function CreateTab(eventInfo) {
         <div><b>Тип: </b> ${eventInfo.event_type}</div>
         <div><b>Действующие лица: </b><ul>`;
     eventInfo.persons.forEach(function (person) {
-        content = content + `<li>' ${person}</li>`;
+        content = content + `<li>${person}</li>`;
     });
     content = content + '</ul></div><div><b>Встречаемые топонимы: </b><ul>';
     eventInfo.toponyms.forEach(function (toponym) {
-        content = content + `<li>' ${toponym}</li>`;
+        content = content + `<li>${toponym}</li>`;
     });
     content = content + '</ul></div></div>';
     $(content).appendTo('.tab-content');
